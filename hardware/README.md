@@ -54,6 +54,4 @@ Count | Type                        | Package      | Info
 
 [ As soon as design is tested in the field, there will be an OshPark link here ]
 
-![](../img/pi-adapter-sch.png)
-
 ![](../img/pi-adapter-pcb.png)
