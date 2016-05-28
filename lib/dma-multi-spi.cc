@@ -77,6 +77,7 @@ static void *mmap_bcm_register(off_t register_offset) {
   return result;
 }
 
+namespace spixels {
 namespace {
 class DMAMultiSPI : public MultiSPI {
 public:
@@ -102,12 +103,7 @@ private:
     GPIOData *gpio_shadow_;
     size_t gpio_copy_size_;
 };
-}
-
-// Factory.
-MultiSPI *CreateDMAMultiSPI(int clock_gpio) {
-    return new DMAMultiSPI(clock_gpio);
-}
+}  // end anonymous namespace
 
 struct DMAMultiSPI::GPIOData {
     uint32_t set;
@@ -225,3 +221,10 @@ void DMAMultiSPI::SendBuffers() {
     dma_channel_->cs &= ~DMA_CS_ACTIVE;
     dma_channel_->cs |= DMA_CS_RESET;
 }
+
+
+// Public interface
+MultiSPI *CreateDMAMultiSPI(int clock_gpio) {
+    return new DMAMultiSPI(clock_gpio);
+}
+}  // namespace spixels

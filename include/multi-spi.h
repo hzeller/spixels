@@ -12,18 +12,23 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://gnu.org/licenses/gpl-2.0.txt>
-#ifndef RPI_MULTI_SPI_H
-#define RPI_MULTI_SPI_H
+#ifndef SPIXELS_MULTI_SPI_H
+#define SPIXELS_MULTI_SPI_H
 
 #include <stdint.h>
 #include <stddef.h>
 
+namespace spixels {
 // MultiSPI outputs multiple SPI streams in parallel on different GPIOs.
 // The clock is on a single GPIO-pin. This way, we can transmit 25-ish
 // SPI streams in parallel on a Pi with 40 IO pins.
 // Current implementation assumes that all streams have the same amount
 // of data.
 // Also, there is no chip-select at this point (not needed for the LED strips).
+//
+// This can be used of course of LED strips (see led-strip.h for the API), but
+// for all kinds of other SPI data you want to send to multiple devices in
+// a fire-and-forget way.
 class MultiSPI {
 public:
     // Names of the pin-headers on the breakout board.
@@ -49,11 +54,6 @@ public:
         SPI_P16 = 20,
     };
 
-    // Create MultiSPI that outputs clock on the "clock_gpio" pin. The
-    // "serial_bytes_per_stream" define the length of the transmission in
-    // each stream. This creates the necessary buffers for streams, all
-    // initialized to zero.
-    explicit MultiSPI(int clock_gpio = SPI_CLOCK);
     virtual ~MultiSPI() {}
 
     // Register a new data stream for the given GPIO. The SPI data is
@@ -85,5 +85,6 @@ public:
 //   - Limited speed (1-2Mhz). Good for WS2801 which can't go faste
 //     anyway. Worse for LDP6803 or APA102 that can go much faster.
 MultiSPI *CreateDMAMultiSPI(int clock_gpio = MultiSPI::SPI_CLOCK);
+}
 
-#endif  // RPI_MULTI_SPI_H
+#endif  // SPIXELS_MULTI_SPI_H
