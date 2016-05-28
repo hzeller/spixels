@@ -1,4 +1,4 @@
-LIB_OBJECTS=ft-gpio.o multi-spi.o rpi-dma.o mailbox.o
+LIB_OBJECTS=ft-gpio.o dma-multi-spi.o rpi-dma.o mailbox.o
 CFLAGS=-Wall -O3 $(INCLUDES) $(DEFINES)
 CXXFLAGS=$(CFLAGS)
 INCLUDES=-I../include -I.

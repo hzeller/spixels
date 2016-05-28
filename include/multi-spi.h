@@ -15,9 +15,7 @@
 #ifndef RPI_MULTI_SPI_H
 #define RPI_MULTI_SPI_H
 
-#include "ft-gpio.h"
-#include "rpi-dma.h"
-
+#include <stdint.h>
 #include <stddef.h>
 
 // MultiSPI outputs multiple SPI streams in parallel on different GPIOs.
@@ -32,25 +30,23 @@ public:
     enum {
         SPI_CLOCK = 27,
 
-        SPI_P6  = 23,
-        SPI_P7  = 17,
-        SPI_P8  =  4,
-        SPI_P9  = 14,  // This will be 18 with the new board.
+        SPI_P1  = 18,
+        SPI_P2  = 23,
+        SPI_P3  = 22,
+        SPI_P4  =  5,
+        SPI_P5  = 12,
+        SPI_P6  = 16,
+        SPI_P7  = 19,
+        SPI_P8  = 21,
 
-        SPI_P10 =  5,
-        SPI_P11 = 25,
-        SPI_P12 = 24,
-        SPI_P13 = 22,
-
-        SPI_P14 = 16,
-        SPI_P15 = 13,
-        SPI_P16 =  6,
-        SPI_P17 = 12,
-
-        SPI_P18 = 21,
-        SPI_P19 = 20,
-        SPI_P20 = 26,
-        SPI_P21 = 19,
+        SPI_P9  =  4,
+        SPI_P10 = 17,
+        SPI_P11 = 24,
+        SPI_P12 = 25,
+        SPI_P13 =  6,
+        SPI_P14 = 13,
+        SPI_P15 = 26,
+        SPI_P16 = 20,
     };
 
     // Create MultiSPI that outputs clock on the "clock_gpio" pin. The
@@ -58,7 +54,7 @@ public:
     // each stream. This creates the necessary buffers for streams, all
     // initialized to zero.
     explicit MultiSPI(int clock_gpio = SPI_CLOCK);
-    ~MultiSPI();
+    virtual ~MultiSPI() {}
 
     // Register a new data stream for the given GPIO. The SPI data is
     // sent with the common clock and this gpio pin.
@@ -67,31 +63,27 @@ public:
     // same clock with everyone and it depends on what is the longest requested
     // length.
     // Overlength transmission bytes are all zero.
-    bool RegisterDataGPIO(int gpio, size_t serial_byte_size);
+    virtual bool RegisterDataGPIO(int gpio, size_t serial_byte_size) = 0;
 
     // This needs to be called after all RegisterDataGPIO have been called.
-    void FinishRegistration();
+    virtual void FinishRegistration() = 0;
 
     // Set data byte for given gpio channel at given position in the
     // stream. "pos" needs to be in range [0 .. serial_bytes_per_stream)
     // Data is sent with next Send().
-    void SetBufferedByte(int data_gpio, size_t pos, uint8_t data);
+    virtual void SetBufferedByte(int data_gpio, size_t pos, uint8_t data) = 0;
 
     // Send data for all streams. Wait for completion.
-    void SendBuffers();
-    
-private:
-    struct GPIOData;
-    ft::GPIO gpio_;
-    const int clock_gpio_;
-    size_t size_;
-
-    struct UncachedMemBlock alloced_;
-    GPIOData *gpio_dma_;
-    struct dma_cb* start_block_;
-    struct dma_channel_header* dma_channel_;
-
-    GPIOData *gpio_shadow_;
-    size_t gpio_copy_size_;
+    virtual void SendBuffers() = 0;
 };
+
+// Factory to create a MultiSPI implementation that uses DMA to output.
+// Advantages:
+//   - Does not use CPU
+//   - Jitter does not exceed several 10 usec. Needed for WS2801.
+// Disadvantage:
+//   - Limited speed (1-2Mhz). Good for WS2801 which can't go faste
+//     anyway. Worse for LDP6803 or APA102 that can go much faster.
+MultiSPI *CreateDMAMultiSPI(int clock_gpio = MultiSPI::SPI_CLOCK);
+
 #endif  // RPI_MULTI_SPI_H

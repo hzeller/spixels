@@ -15,6 +15,9 @@
 
 #include "multi-spi.h"
 
+#include "ft-gpio.h"
+#include "rpi-dma.h"
+
 #include <assert.h>
 #include <strings.h>
 #include <stdlib.h>
@@ -74,14 +77,46 @@ static void *mmap_bcm_register(off_t register_offset) {
   return result;
 }
 
-struct MultiSPI::GPIOData {
+namespace {
+class DMAMultiSPI : public MultiSPI {
+public:
+    explicit DMAMultiSPI(int clock_gpio);
+    virtual ~DMAMultiSPI();
+
+    virtual bool RegisterDataGPIO(int gpio, size_t serial_byte_size);
+    virtual void FinishRegistration();
+    virtual void SetBufferedByte(int data_gpio, size_t pos, uint8_t data);
+    virtual void SendBuffers();
+
+private:
+    struct GPIOData;
+    ft::GPIO gpio_;
+    const int clock_gpio_;
+    size_t size_;
+
+    struct UncachedMemBlock alloced_;
+    GPIOData *gpio_dma_;
+    struct dma_cb* start_block_;
+    struct dma_channel_header* dma_channel_;
+
+    GPIOData *gpio_shadow_;
+    size_t gpio_copy_size_;
+};
+}
+
+// Factory.
+MultiSPI *CreateDMAMultiSPI(int clock_gpio) {
+    return new DMAMultiSPI(clock_gpio);
+}
+
+struct DMAMultiSPI::GPIOData {
     uint32_t set;
     uint32_t ignored_upper_set_bits; // bits 33..54 of GPIO. Not needed.
     uint32_t reserved_area;          // gap between GPIO registers.
     uint32_t clr;
 };
 
-MultiSPI::MultiSPI(int clock_gpio)
+DMAMultiSPI::DMAMultiSPI(int clock_gpio)
     : clock_gpio_(clock_gpio), size_(0), gpio_dma_(NULL), gpio_shadow_(NULL) {
     alloced_.mem = NULL;
     bool success = gpio_.Init();
@@ -90,18 +125,18 @@ MultiSPI::MultiSPI(int clock_gpio)
     assert(success);  // clock pin not valid
 }
 
-MultiSPI::~MultiSPI() {
+DMAMultiSPI::~DMAMultiSPI() {
     UncachedMemBlock_free(&alloced_);
     free(gpio_shadow_);
 }
 
-bool MultiSPI::RegisterDataGPIO(int gpio, size_t serial_byte_size) {
+bool DMAMultiSPI::RegisterDataGPIO(int gpio, size_t serial_byte_size) {
     if (serial_byte_size > size_)
         size_ = serial_byte_size;
     return gpio_.AddOutput(gpio);
 }
 
-void MultiSPI::FinishRegistration() {
+void DMAMultiSPI::FinishRegistration() {
     assert(alloced_.mem == NULL);  // Registered twice ?
     // One DMA operation can only span a limited amount of range.
     const int kMaxOpsPerBlock = (2<<15) / sizeof(GPIOData);
@@ -159,7 +194,7 @@ void MultiSPI::FinishRegistration() {
     dma_channel_ = (struct dma_channel_header*)(dmaBase + 0x100 * DMA_CHANNEL);
 }
 
-void MultiSPI::SetBufferedByte(int data_gpio, size_t pos, uint8_t data) {
+void DMAMultiSPI::SetBufferedByte(int data_gpio, size_t pos, uint8_t data) {
     assert(pos < size_);
     GPIOData *buffer_pos = gpio_shadow_ + 2 * 8 * pos;
     for (uint8_t bit = 0x80; bit; bit >>= 1, buffer_pos += 2) {
@@ -173,7 +208,7 @@ void MultiSPI::SetBufferedByte(int data_gpio, size_t pos, uint8_t data) {
     }
 }
 
-void MultiSPI::SendBuffers() {
+void DMAMultiSPI::SendBuffers() {
     memcpy(gpio_dma_, gpio_shadow_, gpio_copy_size_);
 
     dma_channel_->cs |= DMA_CS_END;
