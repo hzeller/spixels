@@ -20,9 +20,18 @@ int main() {
 
     spi->FinishRegistration();  // Done registering all the the strips.
 
-    for (int i = 0;;++i) {
-        strip1->SetPixel(i % strip1->count(), 255, 0, 0);  // red pixel  
-        strip2->SetPixel(i % strip2->count(), 0, 255, 0);  // green pixel.
+    for (unsigned int i = 0; /**/; ++i) {
+        // Red Pixel, given as RGB hex value.
+        strip1->SetPixel(i % strip1->count(), 0xFF0000);
+
+        // Alternative: A Green pixel, given as RGB-color struct.
+        strip1->SetPixel(i % strip1->count()+1, RGBc(0, 255, 0));
+
+        // Alternative: give values as separate red/green/blue value.
+        strip1->SetPixel(i % strip1->count()+2, 0, 0, 255);
+
+        // A Blue pixel on the second strip.
+        strip2->SetPixel(i % strip2->count(), 0, 0, 255);
     
         spi->SendBuffers();  // Send all pixels out at once.
         usleep(1000000 / FRAME_RATE);

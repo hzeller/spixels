@@ -26,11 +26,34 @@
 
 namespace spixels {
 
+// Red Green Blue color. A color represented by RGB values.
+struct RGBc {
+    // Creating a color with the Red/Green/Blue components. If you are compiling
+    // with C++11, you can even do that in-line
+    // LEDStrip::SetPixel(0, {255, 255, 255});
+    RGBc(uint8_t red, uint8_t green, uint8_t blue) : r(red), g(green), b(blue){}
+
+    // Setting a color from a single 24Bit 0xRRGGBB hex-value, e.g. 0xff00ff
+    RGBc(uint32_t hexcolor)
+        : r((hexcolor >> 16) & 0xFF),
+          g((hexcolor >>  8) & 0xFF),
+          b((hexcolor >>  0) & 0xFF) {}
+
+    uint8_t r;
+    uint8_t g;
+    uint8_t b;
+};
+
 // Simplest possible way for a LED strip.
 class LEDStrip {
 public:
     virtual ~LEDStrip() {}
-    virtual void SetPixel(int pos, uint8_t red, uint8_t green, uint8_t blue) = 0;
+    virtual void SetPixel(int pos, const RGBc& c) = 0;
+
+    void SetPixel(int pos, uint8_t r, uint8_t g, uint8_t b) {
+        SetPixel(pos, RGBc(r, g, b));
+    }
+
     // TODO: set global brightness ?
 
     // Return number of attached LEDs.

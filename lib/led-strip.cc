@@ -52,11 +52,11 @@ public:
         : LEDStrip(count), spi_(spi), gpio_(gpio) {
         spi_->RegisterDataGPIO(gpio, count * 3);
     }
-    virtual void SetPixel(int pos, uint8_t red, uint8_t green, uint8_t blue) {
+    virtual void SetPixel(int pos, const RGBc &c) {
         if (pos < 0 || pos >= count_) return;
-        spi_->SetBufferedByte(gpio_, 3 * pos + 0, luminance_cie1931(8, red));
-        spi_->SetBufferedByte(gpio_, 3 * pos + 1, luminance_cie1931(8, green));
-        spi_->SetBufferedByte(gpio_, 3 * pos + 2, luminance_cie1931(8, blue));
+        spi_->SetBufferedByte(gpio_, 3 * pos + 0, luminance_cie1931(8, c.r));
+        spi_->SetBufferedByte(gpio_, 3 * pos + 1, luminance_cie1931(8, c.g));
+        spi_->SetBufferedByte(gpio_, 3 * pos + 2, luminance_cie1931(8, c.b));
     }
 
 private:
@@ -76,15 +76,15 @@ public:
         spi_->SetBufferedByte(gpio_, 2, 0x00);
         spi_->SetBufferedByte(gpio_, 3, 0x00);
         for (int pos = 0; pos < count; ++pos)
-            SetPixel(pos, 0, 0, 0);     // Initialize all top-bits.
+            SetPixel(pos, 0x000000);     // Initialize all top-bits.
     }
-    virtual void SetPixel(int pos, uint8_t red, uint8_t green, uint8_t blue) {
+    virtual void SetPixel(int pos, const RGBc &c) {
         if (pos < 0 || pos >= count_) return;
         uint16_t data = 0;
         data |= (1<<15);  // start bit
-        data |= luminance_cie1931(5, red)   << 10;
-        data |= luminance_cie1931(5, green) <<  5;
-        data |= luminance_cie1931(5, blue)  <<  0;
+        data |= luminance_cie1931(5, c.r)   << 10;
+        data |= luminance_cie1931(5, c.g) <<  5;
+        data |= luminance_cie1931(5, c.b)  <<  0;
 
         spi_->SetBufferedByte(gpio_, 2 * pos + 4 + 0, data >> 8);
         spi_->SetBufferedByte(gpio_, 2 * pos + 4 + 1, data & 0xFF);
@@ -113,21 +113,21 @@ public:
 
         // Initialize all the top bits.
         for (int pos = 0; pos < count; ++pos)
-            SetPixel(pos, 0, 0, 0);
+            SetPixel(pos, 0x000000);
 
         // We need a couple of more bits clocked at the end.
         for (size_t tail = 4 + 4*count; tail < bytes_needed; ++tail) {
             spi_->SetBufferedByte(gpio_, tail, 0xff);
         }
     }
-    virtual void SetPixel(int pos, uint8_t red, uint8_t green, uint8_t blue) {
+    virtual void SetPixel(int pos, const RGBc &c) {
         if (pos < 0 || pos >= count_) return;
         const uint8_t global_brigthness = 0x1F;  // full brightness for now
         const int base = 4 + 4 * pos;
         spi_->SetBufferedByte(gpio_, base + 0, 0xE0 | global_brigthness);
-        spi_->SetBufferedByte(gpio_, base + 1, luminance_cie1931(8, red));
-        spi_->SetBufferedByte(gpio_, base + 1, luminance_cie1931(8, green));
-        spi_->SetBufferedByte(gpio_, base + 1, luminance_cie1931(8, blue));
+        spi_->SetBufferedByte(gpio_, base + 1, luminance_cie1931(8, c.r));
+        spi_->SetBufferedByte(gpio_, base + 1, luminance_cie1931(8, c.g));
+        spi_->SetBufferedByte(gpio_, base + 1, luminance_cie1931(8, c.b));
     }
 
 private:
