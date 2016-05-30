@@ -82,9 +82,9 @@ public:
         if (pos < 0 || pos >= count_) return;
         uint16_t data = 0;
         data |= (1<<15);  // start bit
-        data |= luminance_cie1931(5, c.r)   << 10;
+        data |= luminance_cie1931(5, c.r) << 10;
         data |= luminance_cie1931(5, c.g) <<  5;
-        data |= luminance_cie1931(5, c.b)  <<  0;
+        data |= luminance_cie1931(5, c.b) <<  0;
 
         spi_->SetBufferedByte(gpio_, 2 * pos + 4 + 0, data >> 8);
         spi_->SetBufferedByte(gpio_, 2 * pos + 4 + 1, data & 0xFF);
@@ -100,7 +100,7 @@ public:
     APA102LedStrip(MultiSPI *spi, int gpio, int count)
         : LEDStrip(count), spi_(spi), gpio_(gpio) {
         const size_t startframe_size = 4;
-        const size_t endframe_size = 8 + 8*(count / 16);
+        const size_t endframe_size = (count+15) / 16;
         const size_t bytes_needed = startframe_size + 4*count + endframe_size;
 
         spi_->RegisterDataGPIO(gpio, bytes_needed);
@@ -125,9 +125,9 @@ public:
         const uint8_t global_brigthness = 0x1F;  // full brightness for now
         const int base = 4 + 4 * pos;
         spi_->SetBufferedByte(gpio_, base + 0, 0xE0 | global_brigthness);
-        spi_->SetBufferedByte(gpio_, base + 1, luminance_cie1931(8, c.r));
-        spi_->SetBufferedByte(gpio_, base + 1, luminance_cie1931(8, c.g));
         spi_->SetBufferedByte(gpio_, base + 1, luminance_cie1931(8, c.b));
+        spi_->SetBufferedByte(gpio_, base + 2, luminance_cie1931(8, c.g));
+        spi_->SetBufferedByte(gpio_, base + 3, luminance_cie1931(8, c.r));
     }
 
 private:
