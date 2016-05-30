@@ -20,8 +20,9 @@ You find the board in the [hardware/](./hardware) directory.
 The adpater is compatible with any Raspberry Pi with 40 GPIO pins, such as the
 Pi 1 B+, Pi 2 or Pi 3.
 
-Of course, you can use the MultiSPI thing for other simple devices
-![](img/pi-adapter-pcb.png)
+Of course, you can use the MultiSPI feature to send data to other simple
+devices.
+<a href="hardware/"><img src="img/pi-adapter-pcb.png" width="400px"></a>
 
 This is used in the [FlaschenTaschen] project, in which only 9 of the 16
 connectors are used, one for each 'crate column'. The update rate with
