@@ -103,7 +103,7 @@ private:
     struct dma_channel_header* dma_channel_;
 
     GPIOData *gpio_shadow_;
-    size_t gpio_copy_size_;
+    size_t gpio_buffer_size_;
 };
 }  // end anonymous namespace
 
@@ -129,8 +129,34 @@ DMAMultiSPI::~DMAMultiSPI() {
 }
 
 bool DMAMultiSPI::RegisterDataGPIO(int gpio, size_t serial_byte_size) {
-    if (serial_byte_size > size_)
+    if (serial_byte_size > size_) {
+        const int prev_gpio_operations = size_ * 8 * 2 + 1;
         size_ = serial_byte_size;
+        const int gpio_operations = size_ * 8 * 2 + 1;
+        gpio_buffer_size_ = gpio_operations * sizeof(GPIOData);
+        // We keep an in-memory buffer that we directly manipulate in
+        // SetBufferedByte() operations and then copy to the DMA managed buffer
+        // when actually sending. Reason is, that the DMA buffer is uncached
+        // memory and very slow to access in particular for the operations needed
+        // in SetBufferedByte().
+        // RegisterDataGPIO() can be called multiple times with different sizes,
+        // so we need to be prepared to adjust size.
+	if (gpio_shadow_ == NULL) {
+            gpio_shadow_ = (GPIOData*)malloc(gpio_buffer_size_);
+        } else {
+            gpio_shadow_ = (GPIOData*)realloc(gpio_shadow_, gpio_buffer_size_);
+        }
+        bzero(gpio_shadow_ + prev_gpio_operations*sizeof(GPIOData),
+              (gpio_operations - prev_gpio_operations)*sizeof(GPIOData));
+        // Prepare every other element to set the CLK pin
+        for (int i = prev_gpio_operations; i < gpio_operations; ++i) {
+            if (i % 2 == 0)
+                gpio_shadow_[i].clr = (1<<clock_gpio_);
+            else
+                gpio_shadow_[i].set = (1<<clock_gpio_);
+        }
+    }
+
     return gpio_.AddOutput(gpio);
 }
 
@@ -173,20 +199,6 @@ void DMAMultiSPI::FinishRegistration() {
     // First block in our chain.
     start_block_ = (struct dma_cb*) alloced_.mem;
 
-    // --- All the memory operations we do in cached memory as direct operations
-    // on the uncached memory (which is used by the DMA operation) is pretty
-    // slow - and we need multiple read/write operations.
-    gpio_shadow_ = (struct GPIOData*)calloc(gpio_operations, sizeof(GPIOData));
-    gpio_copy_size_ = gpio_operations * sizeof(GPIOData);
-
-    // Now, we can already prepare every other element to set the CLK pin
-    for (int i = 0; i < gpio_operations; ++i) {
-        if (i % 2 == 0)
-            gpio_shadow_[i].clr = (1<<clock_gpio_);
-        else
-            gpio_shadow_[i].set = (1<<clock_gpio_);
-    }
-
     // 4.2.1.2
     char *dmaBase = (char*)mmap_bcm_register(DMA_BASE);
     dma_channel_ = (struct dma_channel_header*)(dmaBase + 0x100 * DMA_CHANNEL);
@@ -207,7 +219,8 @@ void DMAMultiSPI::SetBufferedByte(int data_gpio, size_t pos, uint8_t data) {
 }
 
 void DMAMultiSPI::SendBuffers() {
-    memcpy(gpio_dma_, gpio_shadow_, gpio_copy_size_);
+    assert(gpio_dma_ != NULL);  // FinishRegistration called ?
+    memcpy(gpio_dma_, gpio_shadow_, gpio_buffer_size_);
 
     dma_channel_->cs |= DMA_CS_END;
     dma_channel_->cblock = UncachedMemBlock_to_physical(&alloced_, start_block_);
