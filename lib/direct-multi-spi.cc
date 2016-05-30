@@ -34,7 +34,6 @@ public:
     virtual ~DirectMultiSPI();
 
     virtual bool RegisterDataGPIO(int gpio, size_t serial_byte_size);
-    virtual void FinishRegistration() {}
     virtual void SetBufferedByte(int data_gpio, size_t pos, uint8_t data);
     virtual void SendBuffers();
 

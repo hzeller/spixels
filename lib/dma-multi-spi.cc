@@ -24,6 +24,7 @@
 #include <strings.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 
 // mmap-bcm-register
 #include <fcntl.h>
@@ -87,11 +88,12 @@ public:
     virtual ~DMAMultiSPI();
 
     virtual bool RegisterDataGPIO(int gpio, size_t serial_byte_size);
-    virtual void FinishRegistration();
     virtual void SetBufferedByte(int data_gpio, size_t pos, uint8_t data);
     virtual void SendBuffers();
 
 private:
+    void FinishRegistration();
+
     struct GPIOData;
     ft::GPIO gpio_;
     const int clock_gpio_;
@@ -129,6 +131,11 @@ DMAMultiSPI::~DMAMultiSPI() {
 }
 
 bool DMAMultiSPI::RegisterDataGPIO(int gpio, size_t serial_byte_size) {
+    if (gpio_dma_ != NULL) {
+        fprintf(stderr, "Can not register DataGPIO after SendBuffers() has been"
+                "called\n");
+        assert(0);
+    }
     if (serial_byte_size > size_) {
         const int prev_gpio_operations = size_ * 8 * 2 + 1;
         size_ = serial_byte_size;
@@ -219,7 +226,7 @@ void DMAMultiSPI::SetBufferedByte(int data_gpio, size_t pos, uint8_t data) {
 }
 
 void DMAMultiSPI::SendBuffers() {
-    assert(gpio_dma_ != NULL);  // FinishRegistration called ?
+    if (!gpio_dma_) FinishRegistration();
     memcpy(gpio_dma_, gpio_shadow_, gpio_buffer_size_);
 
     dma_channel_->cs |= DMA_CS_END;

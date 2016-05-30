@@ -68,15 +68,13 @@ public:
     // Overlength transmission bytes are all zero.
     virtual bool RegisterDataGPIO(int gpio, size_t serial_byte_size) = 0;
 
-    // This needs to be called after all RegisterDataGPIO have been called.
-    virtual void FinishRegistration() = 0;
-
     // Set data byte for given gpio channel at given position in the
     // stream. "pos" needs to be in range [0 .. serial_bytes_per_stream)
     // Data is sent with next Send().
     virtual void SetBufferedByte(int data_gpio, size_t pos, uint8_t data) = 0;
 
-    // Send data for all streams. Wait for completion.
+    // Send data for all streams. Wait for completion. After SendBuffers()
+    // has been called once, no new GPIOs can be registered.
     virtual void SendBuffers() = 0;
 };
 

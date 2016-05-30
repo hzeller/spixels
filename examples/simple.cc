@@ -25,10 +25,6 @@ int main() {
     LEDStrip *strip2 = CreateAPA102Strip(spi, MultiSPI::SPI_P2, 144);
     // ... register more strips here. They can be of different types
 
-    // Finish Registration has to be called after all strips have been
-    // registered.
-    spi->FinishRegistration();
-
     for (unsigned int i = 0; /**/; ++i) {
 	const int pos = i % strip1->count();
         strip1->SetPixel(pos, 0x000000);   // clear previous pixel.
