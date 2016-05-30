@@ -80,13 +80,28 @@ public:
     virtual void SendBuffers() = 0;
 };
 
+// Factory to create a MultiSPI implementation that directly writes to
+// GPIO. Unless you use a WS2801 strip, this is typically what you want.
+// Advantages:
+//   - Fast
+// Disadvantages:
+//   - Potentially has jitter which is problematic with LED-strips that
+//     use a time-component for triggering (WS2801).
+// Parameter:
+//   "speed_mhz" rough speed in Mhz of the SPI clock. Useful values 1..15
+//   Default is 4. Increase if your set-up can do more and you need the
+//   speed. Decrease if you see erratic behavior.
+MultiSPI *CreateDirectMultiSPI(int speed_mhz = 4,
+                               int clock_gpio = MultiSPI::SPI_CLOCK);
+
 // Factory to create a MultiSPI implementation that uses DMA to output.
 // Advantages:
 //   - Does not use CPU
 //   - Jitter does not exceed several 10 usec. Needed for WS2801.
 // Disadvantage:
-//   - Limited speed (1-2Mhz). Good for WS2801 which can't go faste
-//     anyway. Worse for LDP6803 or APA102 that can go much faster.
+//   - Limited speed (1-2Mhz). Good for WS2801 which can't go faster
+//     anyway, but wasting potential with LDP6803 or APA102 that can go
+//     much faster.
 MultiSPI *CreateDMAMultiSPI(int clock_gpio = MultiSPI::SPI_CLOCK);
 }
 
