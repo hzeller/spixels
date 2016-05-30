@@ -52,6 +52,8 @@ Count | Type                        | Package      | Info
    16 | 4x1 pin header              | 0.1" raster  | to connect to LED strips
     1 | Fuse holder                 | for 20mm fuse| Optional (see text)
 
-[ As soon as design is tested in the field, there will be an OshPark link here ]
+The board is also [shared on OSH Park][oshpark-pcb] (not affiliated).
 
 ![](../img/pi-adapter-pcb.png)
+
+[oshpark-pcb]: https://oshpark.com/shared_projects/BTdhLFc3
