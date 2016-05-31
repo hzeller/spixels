@@ -48,13 +48,17 @@ struct RGBc {
 class LEDStrip {
 public:
     virtual ~LEDStrip() {}
+
+    // Set pixel color. Input it sRGB, output is luminance corrected.
     virtual void SetPixel(int pos, const RGBc& c) = 0;
 
     void SetPixel(int pos, uint8_t r, uint8_t g, uint8_t b) {
         SetPixel(pos, RGBc(r, g, b));
     }
 
-    // TODO: set global brightness ?
+    // Set overall brightness for all pixels. Range of [0.0 ... 1.0].
+    // Not all LEDStrips might have this implemented (only APA102 right now).
+    virtual void SetBrightness(float brightness) {}
 
     // Return number of attached LEDs.
     inline int count() const { return count_; }
