@@ -24,6 +24,8 @@ Of course, you can use the MultiSPI feature to send data to other simple
 devices.
 <a href="hardware/"><img src="img/pi-adapter-pcb.png" width="400px"></a>
 
+<a href="hardware/"><img src="img/pi-adapter-irl.jpg" width="200px"></a>
+
 This is used in the [FlaschenTaschen] project, in which only 9 of the 16
 connectors are used, one for each 'crate column'. The update rate with
 WS2801 reaches 160fps!.
