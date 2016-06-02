@@ -15,7 +15,8 @@ The C++ library can be found in [include/](./include) and
 [lib/](./lib), with examples in the, you guessed it,
 [examples/](./examples) directory.
 
-You find the board in the [hardware/](./hardware) directory.
+You find the board in the [hardware/](./hardware) directory (including OshPark
+link).
 
 The adpater is compatible with any Raspberry Pi with 40 GPIO pins, such as the
 Pi 1 B+, Pi 2 or Pi 3.
