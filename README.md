@@ -27,7 +27,7 @@ devices.
 <a href="img/pi-adapter-irl.jpg"><img src="img/pi-adapter-irl.jpg" width="300px"></a>
 
 
-A single APA102 connected to the board:
+A single APA102 strip connected to the board:
 
 [![Spixels simple][run-vid]](http://youtu.be/HAbR64yrjUk)
 

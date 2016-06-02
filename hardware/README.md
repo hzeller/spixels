@@ -22,8 +22,9 @@ GND | CLK | DATA | +5V
 * Input power (5V) operates level shifter as well as the Raspberry Pi; no
   separate USB supply needed.
 * Fused 5V outputs on connectors to prevent accidents.
-* Breakout for I2C, UART and SPI busses of Raspberry Pi to allow connecting
-  other peripherals.
+* The pins of the I2C, UART and SPI busses of Raspberry Pi are not
+  occupied by the data lines. They are broken out and allow connecting
+  other common peripherals.
 
 The CLK is shared, but each connector gets a dedicated buffered signal.
 
