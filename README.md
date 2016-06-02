@@ -23,8 +23,12 @@ Pi 1 B+, Pi 2 or Pi 3.
 Of course, you can use the MultiSPI feature to send data to other simple
 devices.
 <a href="hardware/"><img src="img/pi-adapter-pcb.png" width="400px"></a>
+<a href="img/pi-adapter-irl.jpg"><img src="img/pi-adapter-irl.jpg" width="300px"></a>
 
-<a href="hardware/"><img src="img/pi-adapter-irl.jpg" width="200px"></a>
+
+A single APA102 connected to the board:
+
+[![Spixels simple][run-vid]](http://youtu.be/HAbR64yrjUk)
 
 This is used in the [FlaschenTaschen] project, in which only 9 of the 16
 connectors are used, one for each 'crate column'. The update rate with
@@ -33,4 +37,4 @@ WS2801 reaches 160fps!.
 ![](img/flaschen-taschen.jpg)
 
 [FlaschenTaschen]: https://github.com/hzeller/flaschen-taschen
-
+[run-vid]: ./img/spixels-video.jpg
