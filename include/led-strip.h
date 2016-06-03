@@ -28,6 +28,8 @@ namespace spixels {
 
 // Red Green Blue color. A color represented by RGB values.
 struct RGBc {
+    RGBc(): r(0), g(0), b(0){}
+
     // Creating a color with the Red/Green/Blue components. If you are compiling
     // with C++11, you can even do that in-line
     // LEDStrip::SetPixel(0, {255, 255, 255});
@@ -49,16 +51,21 @@ class LEDStrip {
 public:
     virtual ~LEDStrip() {}
 
-    // Set pixel color. Input it sRGB, output is luminance corrected.
+    // Set pixel color. Input it RGB, output is luminance corrected
+    // you don't have to apply pre-correction.
     virtual void SetPixel(int pos, const RGBc& c) = 0;
 
     void SetPixel(int pos, uint8_t r, uint8_t g, uint8_t b) {
         SetPixel(pos, RGBc(r, g, b));
     }
 
-    // Set overall brightness for all pixels. Range of [0.0 ... 1.0].
-    // Not all LEDStrips might have this implemented (only APA102 right now).
-    virtual void SetBrightness(float brightness) {}
+    // Set overall brightness for all pixels. Range of [0 .. 255].
+    // This scales the brightness so that it looks linear luminance corrected
+    // for the eye.
+    //
+    // Not all LEDStrips have this implemented as many have not enough
+    // PWM resolution for this to be useful. Only APA102 provides this now.
+    virtual void SetBrightness(uint8_t brigthness) {}
 
     // Return number of attached LEDs.
     inline int count() const { return count_; }
