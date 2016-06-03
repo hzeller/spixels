@@ -15,6 +15,17 @@ The C++ library can be found in [include/](./include) and
 [lib/](./lib), with examples in the, you guessed it,
 [examples/](./examples) directory.
 
+If you want to use the library in your own projects, just add it as a
+sub-module to your project:
+
+```
+git submodule add https://github.com/hzeller/spixels
+```
+
+You now have a subdirectory `spixels/` in your project. See
+the [Makefile](./examples/Makefile) in the examples/ directory as a
+template how to use it with your project.
+
 You find the board in the [hardware/](./hardware) directory (including OshPark
 link).
 
