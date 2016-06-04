@@ -1,7 +1,7 @@
 16 LED strip Raspberry Pi Adapter
 =================================
 
-Adapter to connect up to 16 SPI-type LED strips (e.g. WS2801, LDP6803 or APA102).
+Adapter to connect up to 16 SPI-type LED strips (e.g. WS2801, LPD6803 or APA102).
 The software to control these SPI outputs can be found in the `MultiSPI` class
 in this project.
 
@@ -22,9 +22,9 @@ GND | CLK | DATA | +5V
 * Input power (5V) operates level shifter as well as the Raspberry Pi; no
   separate USB supply needed.
 * Fused 5V outputs on connectors to prevent accidents.
-* The pins of the I2C, UART and SPI busses of Raspberry Pi are not
-  occupied by the data lines. They are broken out and allow connecting
-  other common peripherals.
+* The pins of the I²C, UART and system-SPI busses (including both CS-lines)
+  of the Raspberry Pi are not occupied by the data lines. They are broken out
+  and allow connecting other common peripherals.
 
 The CLK is shared, but each connector gets a dedicated buffered signal.
 

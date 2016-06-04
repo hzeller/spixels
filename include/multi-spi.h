@@ -98,7 +98,7 @@ MultiSPI *CreateDirectMultiSPI(int speed_mhz = 4,
 //   - Jitter does not exceed several 10 usec. Needed for WS2801.
 // Disadvantage:
 //   - Limited speed (1-2Mhz). Good for WS2801 which can't go faster
-//     anyway, but wasting potential with LDP6803 or APA102 that can go
+//     anyway, but wasting potential with LPD6803 or APA102 that can go
 //     much faster.
 MultiSPI *CreateDMAMultiSPI(int clock_gpio = MultiSPI::SPI_CLOCK);
 }

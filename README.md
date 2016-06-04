@@ -8,7 +8,7 @@ This is the hardware and library separated out of the [FlaschenTaschen] project
 to be used independently.
 
 This provides a Raspberry Pi Adapter to connect up to 16 SPI-type LED strips
-(such as **APA102**, **WS2801**, **LDP6803**), that are fed by the Raspberry Pi
+(such as **APA102**, **WS2801**, **LPD6803**), that are fed by the Raspberry Pi
 in parallel for fast update rates.
 
 The C++ library can be found in [include/](./include) and
