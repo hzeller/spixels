@@ -97,7 +97,7 @@ private:
     struct GPIOData;
     ft::GPIO gpio_;
     const int clock_gpio_;
-    size_t size_;
+    size_t serial_byte_size_;   // Number of serial bytes to send.
 
     struct UncachedMemBlock alloced_;
     GPIOData *gpio_dma_;
@@ -105,7 +105,7 @@ private:
     struct dma_channel_header* dma_channel_;
 
     GPIOData *gpio_shadow_;
-    size_t gpio_buffer_size_;
+    size_t gpio_buffer_size_;  // Buffer-size for GPIO operations needed.
 };
 }  // end anonymous namespace
 
@@ -117,7 +117,8 @@ struct DMAMultiSPI::GPIOData {
 };
 
 DMAMultiSPI::DMAMultiSPI(int clock_gpio)
-    : clock_gpio_(clock_gpio), size_(0), gpio_dma_(NULL), gpio_shadow_(NULL) {
+    : clock_gpio_(clock_gpio), serial_byte_size_(0),
+      gpio_dma_(NULL), gpio_shadow_(NULL) {
     alloced_.mem = NULL;
     bool success = gpio_.Init();
     assert(success);  // gpio couldn't be initialized
@@ -130,33 +131,39 @@ DMAMultiSPI::~DMAMultiSPI() {
     free(gpio_shadow_);
 }
 
-bool DMAMultiSPI::RegisterDataGPIO(int gpio, size_t serial_byte_size) {
+static int bytes_to_gpio_ops(size_t bytes) {
+    // We need two GPIO-operations to bit-bang transfer one bit: one to set the
+    // data and one to create a positive clock-edge.
+    // For each byte, we have 8 bits.
+    // Also, we need a single operation at the end of everything to set clk low.
+    return bytes * 8 * 2 + 1;
+}
+
+bool DMAMultiSPI::RegisterDataGPIO(int gpio, size_t requested_bytes) {
     if (gpio_dma_ != NULL) {
         fprintf(stderr, "Can not register DataGPIO after SendBuffers() has been"
                 "called\n");
         assert(0);
     }
-    if (serial_byte_size > size_) {
-        const int prev_gpio_operations = size_ * 8 * 2 + 1;
-        size_ = serial_byte_size;
-        const int gpio_operations = size_ * 8 * 2 + 1;
+    if (requested_bytes > serial_byte_size_) {
+        const int prev_gpio_end = bytes_to_gpio_ops(serial_byte_size_) - 1;
+        serial_byte_size_ = requested_bytes;
+        const int gpio_operations = bytes_to_gpio_ops(serial_byte_size_);
         gpio_buffer_size_ = gpio_operations * sizeof(GPIOData);
         // We keep an in-memory buffer that we directly manipulate in
         // SetBufferedByte() operations and then copy to the DMA managed buffer
         // when actually sending. Reason is, that the DMA buffer is uncached
-        // memory and very slow to access in particular for the operations needed
-        // in SetBufferedByte().
+        // memory and very slow to access in particular for the operations
+        // needed in SetBufferedByte().
         // RegisterDataGPIO() can be called multiple times with different sizes,
         // so we need to be prepared to adjust size.
-	if (gpio_shadow_ == NULL) {
-            gpio_shadow_ = (GPIOData*)malloc(gpio_buffer_size_);
-        } else {
-            gpio_shadow_ = (GPIOData*)realloc(gpio_shadow_, gpio_buffer_size_);
-        }
-        bzero(gpio_shadow_ + prev_gpio_operations*sizeof(GPIOData),
-              (gpio_operations - prev_gpio_operations)*sizeof(GPIOData));
-        // Prepare every other element to set the CLK pin
-        for (int i = prev_gpio_operations; i < gpio_operations; ++i) {
+        gpio_shadow_ = (GPIOData*)realloc(gpio_shadow_, gpio_buffer_size_);
+        bzero(gpio_shadow_ + prev_gpio_end,
+              (gpio_operations - prev_gpio_end)*sizeof(GPIOData));
+        // Prepare every other element to set the CLK pin so that later, we
+        // only have to set the data.
+        // Even: data, clock low; Uneven: clock pos edge
+        for (int i = prev_gpio_end; i < gpio_operations; ++i) {
             if (i % 2 == 0)
                 gpio_shadow_[i].clr = (1<<clock_gpio_);
             else
@@ -171,13 +178,13 @@ void DMAMultiSPI::FinishRegistration() {
     assert(alloced_.mem == NULL);  // Registered twice ?
     // One DMA operation can only span a limited amount of range.
     const int kMaxOpsPerBlock = (2<<15) / sizeof(GPIOData);
-    const int gpio_operations = size_ * 8 * 2 + 1;
+    const int gpio_operations = bytes_to_gpio_ops(serial_byte_size_);
     const int control_blocks
         = (gpio_operations + kMaxOpsPerBlock - 1) / kMaxOpsPerBlock;
     const int alloc_size = (control_blocks * sizeof(struct dma_cb)
                             + gpio_operations * sizeof(GPIOData));
     alloced_ = UncachedMemBlock_alloc(alloc_size);
-    gpio_dma_ = (struct GPIOData*) ((uint8_t*)alloced_.mem 
+    gpio_dma_ = (struct GPIOData*) ((uint8_t*)alloced_.mem
                                     + control_blocks * sizeof(struct dma_cb));
 
     struct dma_cb* previous = NULL;
@@ -212,7 +219,7 @@ void DMAMultiSPI::FinishRegistration() {
 }
 
 void DMAMultiSPI::SetBufferedByte(int data_gpio, size_t pos, uint8_t data) {
-    assert(pos < size_);
+    assert(pos < serial_byte_size_);
     GPIOData *buffer_pos = gpio_shadow_ + 2 * 8 * pos;
     for (uint8_t bit = 0x80; bit; bit >>= 1, buffer_pos += 2) {
         if (data & bit) {   // set
