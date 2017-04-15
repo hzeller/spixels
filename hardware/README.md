@@ -44,14 +44,14 @@ If there is no fuse, then the 5V connectors are floating, but note that all
 external power supplies, only connect GND, not 5V to prevent balancing currents.
 
 ### BOM
-Count | Type                        | Package      | Info
------:|-----------------------------|--------------|------------
-    4 | 74HCT245                    | TSSOP-20     | HCT or AHCT _not_ HC.
-    4 | 100nF ceramic capacitor     | 0805         | One per HCT245
-    1 | 22µF ceramic capacitor, 6.3V| 1206         | Stabilizing Pi Power
-    1 | 20x2 female pin socket      | 0.1" raster  | to connect to Pi GPIO
-   16 | 4x1 pin header              | 0.1" raster  | to connect to LED strips
-    1 | Fuse holder                 | for 20mm fuse| Optional (see text)
+|Count | Type                        | Package      | Info
+|-----:|-----------------------------|--------------|------------
+|    4 | 74HCT245                    | TSSOP-20     | HCT or AHCT _not_ HC.
+|    4 | 100nF ceramic capacitor     | 0805         | One per HCT245
+|    1 | 22µF ceramic capacitor, 6.3V| 1206         | Stabilizing Pi Power
+|    1 | 20x2 female pin socket      | 0.1" raster  | to connect to Pi GPIO
+|   16 | 4x1 pin header              | 0.1" raster  | to connect to LED strips
+|    1 | Fuse holder                 | for 20mm fuse| Optional (see text)
 
 The board is also [shared on OSH Park][oshpark-pcb] (not affiliated).
 
