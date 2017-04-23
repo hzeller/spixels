@@ -66,7 +66,7 @@ bool GPIO::AddOutput(int bit) {
     }
 
     const uint32_t gpio_mask = 1 << bit;
-    if ((gpio_mask & kValidBits) == 0)
+    if (bit < 0 || ((gpio_mask & kValidBits) == 0))
         return false;
     INP_GPIO(bit);   // for writing, we first need to set as input.
     OUT_GPIO(bit);

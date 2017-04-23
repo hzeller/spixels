@@ -27,6 +27,32 @@
 #include <algorithm>
 
 namespace spixels {
+
+// This should be in a multi-spi.cc, but that would be the only function. So
+// here is good as well.
+int MultiSPI::SPIPinForConnector(int connector) {
+    switch (connector) {
+    case 1:  return SPI_P1;
+    case 2:  return SPI_P2;
+    case 3:  return SPI_P3;
+    case 4:  return SPI_P4;
+    case 5:  return SPI_P5;
+    case 6:  return SPI_P6;
+    case 7:  return SPI_P7;
+    case 8:  return SPI_P8;
+
+    case 9:  return SPI_P9;
+    case 10: return SPI_P10;
+    case 11: return SPI_P11;
+    case 12: return SPI_P12;
+    case 13: return SPI_P13;
+    case 14: return SPI_P14;
+    case 15: return SPI_P15;
+    case 16: return SPI_P16;
+    }
+    return -1;
+}
+
 namespace {
 class DirectMultiSPI : public MultiSPI {
 public:

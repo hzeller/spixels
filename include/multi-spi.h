@@ -57,10 +57,16 @@ public:
         SPI_P16 = 20,
     };
 
+    // A function that maps the connector number (P1..P16) to the value of
+    // the corresponding SPI Pin SPI_P1..SPI_P16 constant.
+    static int SPIPinForConnector(int connector);
+
     virtual ~MultiSPI() {}
 
     // Register a new data stream for the given GPIO. The SPI data is
-    // sent with the common clock and this gpio pin.
+    // sent with the common clock and this gpio pin. The gpio must be one
+    // of the above SPI_xx constants or the return value of
+    // SPIPinForConnector().
     //
     // Note, each channel might receive more bytes because they share the
     // same clock with everyone and it depends on what is the longest requested
