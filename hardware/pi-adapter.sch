@@ -1,35 +1,9 @@
 EESchema Schematic File Version 2
 LIBS:power
-LIBS:device
-LIBS:transistors
 LIBS:conn
-LIBS:linear
-LIBS:regul
 LIBS:74xx
-LIBS:cmos4000
-LIBS:adc-dac
-LIBS:memory
-LIBS:xilinx
-LIBS:microcontrollers
-LIBS:dsp
-LIBS:microchip
-LIBS:analog_switches
-LIBS:motorola
-LIBS:texas
-LIBS:intel
-LIBS:audio
-LIBS:interface
-LIBS:digital-audio
-LIBS:philips
-LIBS:display
-LIBS:cypress
-LIBS:siliconi
-LIBS:opto
-LIBS:atmel
-LIBS:contrib
-LIBS:valves
 LIBS:pi-adapter-cache
-EELAYER 25 0
+EELAYER 26 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
@@ -77,7 +51,9 @@ F 3 "" H 4550 5150 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	2450 2650 2450 2800
+	2450 2650 2450 2700
+Wire Wire Line
+	2450 2700 2450 2800
 Wire Wire Line
 	2450 2800 2400 2800
 Connection ~ 2450 2700
@@ -119,7 +95,9 @@ F 3 "" H 1800 4600 60  0000 C CNN
 	0    1    1    0   
 $EndComp
 Wire Wire Line
-	1800 4600 1900 4600
+	1800 4600 1850 4600
+Wire Wire Line
+	1850 4600 1900 4600
 $Comp
 L GND #PWR04
 U 1 1 54ECB73E
@@ -221,10 +199,22 @@ Wire Wire Line
 Wire Wire Line
 	1900 5450 1900 5350
 Wire Wire Line
-	1300 5450 2450 5450
+	1300 5450 1600 5450
+Wire Wire Line
+	1600 5450 1900 5450
+Wire Wire Line
+	1900 5450 2200 5450
+Wire Wire Line
+	2200 5450 2450 5450
 Connection ~ 1900 5450
 Wire Wire Line
-	1300 5750 2450 5750
+	1300 5750 1600 5750
+Wire Wire Line
+	1600 5750 1900 5750
+Wire Wire Line
+	1900 5750 2200 5750
+Wire Wire Line
+	2200 5750 2450 5750
 Connection ~ 1900 5750
 $Comp
 L VCC #PWR07
@@ -542,9 +532,13 @@ Wire Wire Line
 Wire Wire Line
 	6100 1650 6100 1850
 Wire Wire Line
-	5400 1200 5400 2100
+	5400 1200 5400 1700
 Wire Wire Line
-	5900 1350 5900 1850
+	5400 1700 5400 2100
+Wire Wire Line
+	5900 1350 5900 1700
+Wire Wire Line
+	5900 1700 5900 1850
 $Comp
 L GND #PWR019
 U 1 1 56C176D3
@@ -572,7 +566,7 @@ L CONN_01X03 P23
 U 1 1 56C196A7
 P 3000 3100
 F 0 "P23" H 3077 3138 50  0000 L CNN
-F 1 "CONN_01X03" H 3077 3046 50  0000 L CNN
+F 1 "UART" H 3077 3046 50  0000 L CNN
 F 2 "Pin_Headers:Pin_Header_Straight_1x03" H 3000 3100 50  0001 C CNN
 F 3 "" H 3000 3100 50  0000 C CNN
 	1    3000 3100
@@ -592,29 +586,18 @@ $EndComp
 $Comp
 L CONN_01X03 P21
 U 1 1 56C19AA9
-P 1400 2900
-F 0 "P21" H 1319 2568 50  0000 C CNN
-F 1 "CONN_01X03" H 1319 2660 50  0000 C CNN
-F 2 "Pin_Headers:Pin_Header_Straight_1x03" H 1400 2900 50  0001 C CNN
-F 3 "" H 1400 2900 50  0000 C CNN
-	1    1400 2900
+P 1200 2900
+F 0 "P21" H 1119 2568 50  0000 C CNN
+F 1 "I2C" H 1119 2660 50  0000 C CNN
+F 2 "Pin_Headers:Pin_Header_Straight_1x03" H 1200 2900 50  0001 C CNN
+F 3 "" H 1200 2900 50  0000 C CNN
+	1    1200 2900
 	-1   0    0    1   
 $EndComp
 Wire Wire Line
-	1600 2800 1900 2800
+	1400 2800 1900 2800
 Wire Wire Line
-	1600 2900 1900 2900
-$Comp
-L GND #PWR021
-U 1 1 56C19EE1
-P 1600 3100
-F 0 "#PWR021" H 1600 3100 30  0001 C CNN
-F 1 "GND" H 1600 3030 30  0001 C CNN
-F 2 "" H 1600 3100 60  0000 C CNN
-F 3 "" H 1600 3100 60  0000 C CNN
-	1    1600 3100
-	1    0    0    -1  
-$EndComp
+	1400 2900 1900 2900
 Text GLabel 2400 3700 2    51   Output ~ 0
 D7
 Text GLabel 3850 1850 0    51   Input ~ 0
@@ -661,7 +644,9 @@ F 3 "" H 2250 1600 50  0000 C CNN
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	1900 1600 2000 1600
+	1900 1600 1950 1600
+Wire Wire Line
+	1950 1600 2000 1600
 Connection ~ 1950 1600
 $Comp
 L VCC #PWR022
@@ -687,7 +672,9 @@ Wire Wire Line
 	1300 5700 1300 5750
 Connection ~ 1600 5750
 Wire Wire Line
-	2500 1600 2700 1600
+	2500 1600 2550 1600
+Wire Wire Line
+	2550 1600 2700 1600
 Wire Wire Line
 	1900 1800 2700 1800
 Wire Wire Line
@@ -703,15 +690,23 @@ Wire Wire Line
 Wire Wire Line
 	5600 1850 5600 2100
 Wire Wire Line
-	5700 1200 5700 2100
+	5700 1200 5700 1600
 Wire Wire Line
-	6200 1350 6200 1850
+	5700 1600 5700 2100
 Wire Wire Line
-	5700 1600 6250 1600
+	6200 1350 6200 1600
+Wire Wire Line
+	6200 1600 6200 1850
+Wire Wire Line
+	5700 1600 6200 1600
+Wire Wire Line
+	6200 1600 6250 1600
 Connection ~ 6200 1600
 Connection ~ 5700 1600
 Wire Wire Line
-	5400 1700 6400 1700
+	5400 1700 5900 1700
+Wire Wire Line
+	5900 1700 6400 1700
 Connection ~ 5900 1700
 Connection ~ 5400 1700
 Wire Wire Line
@@ -783,9 +778,13 @@ Wire Wire Line
 Wire Wire Line
 	6100 3350 6100 3550
 Wire Wire Line
-	5400 2900 5400 3800
+	5400 2900 5400 3400
 Wire Wire Line
-	5900 3050 5900 3550
+	5400 3400 5400 3800
+Wire Wire Line
+	5900 3050 5900 3400
+Wire Wire Line
+	5900 3400 5900 3550
 $Comp
 L GND #PWR023
 U 1 1 56C22C65
@@ -812,15 +811,23 @@ Wire Wire Line
 Wire Wire Line
 	5600 3550 5600 3800
 Wire Wire Line
-	5700 2900 5700 3800
+	5700 2900 5700 3300
 Wire Wire Line
-	6200 3050 6200 3550
+	5700 3300 5700 3800
 Wire Wire Line
-	5700 3300 6250 3300
+	6200 3050 6200 3300
+Wire Wire Line
+	6200 3300 6200 3550
+Wire Wire Line
+	5700 3300 6200 3300
+Wire Wire Line
+	6200 3300 6250 3300
 Connection ~ 6200 3300
 Connection ~ 5700 3300
 Wire Wire Line
-	5400 3400 6400 3400
+	5400 3400 5900 3400
+Wire Wire Line
+	5900 3400 6400 3400
 Connection ~ 5900 3400
 Connection ~ 5400 3400
 Wire Wire Line
@@ -892,9 +899,13 @@ Wire Wire Line
 Wire Wire Line
 	6100 5050 6100 5250
 Wire Wire Line
-	5400 4600 5400 5500
+	5400 4600 5400 5100
 Wire Wire Line
-	5900 4750 5900 5250
+	5400 5100 5400 5500
+Wire Wire Line
+	5900 4750 5900 5100
+Wire Wire Line
+	5900 5100 5900 5250
 $Comp
 L GND #PWR024
 U 1 1 56C22D48
@@ -921,15 +932,23 @@ Wire Wire Line
 Wire Wire Line
 	5600 5250 5600 5500
 Wire Wire Line
-	5700 4600 5700 5500
+	5700 4600 5700 5000
 Wire Wire Line
-	6200 4750 6200 5250
+	5700 5000 5700 5500
 Wire Wire Line
-	5700 5000 6250 5000
+	6200 4750 6200 5000
+Wire Wire Line
+	6200 5000 6200 5250
+Wire Wire Line
+	5700 5000 6200 5000
+Wire Wire Line
+	6200 5000 6250 5000
 Connection ~ 6200 5000
 Connection ~ 5700 5000
 Wire Wire Line
-	5400 5100 6400 5100
+	5400 5100 5900 5100
+Wire Wire Line
+	5900 5100 6400 5100
 Connection ~ 5900 5100
 Connection ~ 5400 5100
 Wire Wire Line
@@ -1001,9 +1020,13 @@ Wire Wire Line
 Wire Wire Line
 	6100 6850 6100 7050
 Wire Wire Line
-	5400 6400 5400 7300
+	5400 6400 5400 6900
 Wire Wire Line
-	5900 6550 5900 7050
+	5400 6900 5400 7300
+Wire Wire Line
+	5900 6550 5900 6900
+Wire Wire Line
+	5900 6900 5900 7050
 $Comp
 L GND #PWR025
 U 1 1 56C22F13
@@ -1030,15 +1053,23 @@ Wire Wire Line
 Wire Wire Line
 	5600 7050 5600 7300
 Wire Wire Line
-	5700 6400 5700 7300
+	5700 6400 5700 6800
 Wire Wire Line
-	6200 6550 6200 7050
+	5700 6800 5700 7300
 Wire Wire Line
-	5700 6800 6250 6800
+	6200 6550 6200 6800
+Wire Wire Line
+	6200 6800 6200 7050
+Wire Wire Line
+	5700 6800 6200 6800
+Wire Wire Line
+	6200 6800 6250 6800
 Connection ~ 6200 6800
 Connection ~ 5700 6800
 Wire Wire Line
-	5400 6900 6400 6900
+	5400 6900 5900 6900
+Wire Wire Line
+	5900 6900 6400 6900
 Connection ~ 5900 6900
 Connection ~ 5400 6900
 Wire Wire Line
@@ -1056,7 +1087,7 @@ L CONN_01X06 P22
 U 1 1 56C265D6
 P 1200 3850
 F 0 "P22" H 1119 3368 50  0000 C CNN
-F 1 "CONN_01X06" H 1119 3460 50  0000 C CNN
+F 1 "System SPI" H 1119 3460 50  0000 C CNN
 F 2 "Pin_Headers:Pin_Header_Straight_1x06" H 1119 3460 50  0001 C CNN
 F 3 "" H 1200 3850 50  0000 C CNN
 	1    1200 3850
@@ -1096,7 +1127,9 @@ F 3 "" H 2550 1600 60  0000 C CNN
 $EndComp
 Connection ~ 2550 1600
 Wire Wire Line
-	1950 1400 1950 1600
+	1950 1400 1950 1450
+Wire Wire Line
+	1950 1450 1950 1600
 $Comp
 L PWR_FLAG #FLG027
 U 1 1 56CA8545
@@ -1134,7 +1167,24 @@ Wire Wire Line
 	2400 3000 2800 3000
 Wire Wire Line
 	2400 3100 2800 3100
-Wire Wire Line
-	1600 3100 1600 3000
 NoConn ~ 1900 3100
+Text Label 1500 2800 0    60   ~ 0
+SDA
+Text Label 1500 2900 0    60   ~ 0
+SCL
+Text Label 2600 3000 0    60   ~ 0
+TxD
+Text Label 2600 3100 0    60   ~ 0
+RxD
+$Comp
+L GND #PWR?
+U 1 1 5934A175
+P 1400 3000
+F 0 "#PWR?" H 1400 3000 30  0001 C CNN
+F 1 "GND" H 1400 2930 30  0001 C CNN
+F 2 "" H 1400 3000 60  0000 C CNN
+F 3 "" H 1400 3000 60  0000 C CNN
+	1    1400 3000
+	1    0    0    -1  
+$EndComp
 $EndSCHEMATC

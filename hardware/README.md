@@ -55,6 +55,7 @@ external power supplies, only connect GND, not 5V to prevent balancing currents.
 
 The board is also [shared on OSH Park][oshpark-pcb] (not affiliated).
 
+![](../img/pi-adapter-schematic.png)
 ![](../img/pi-adapter-pcb.png)
 
 [oshpark-pcb]: https://oshpark.com/shared_projects/BTdhLFc3
