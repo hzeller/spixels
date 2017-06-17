@@ -35,7 +35,7 @@ namespace spixels {
 class MultiSPI {
 public:
     // Names of the pin-headers on the breakout board.
-    enum {
+    enum Pin {
         SPI_CLOCK = 27,
 
         SPI_P1  = 18,
@@ -59,7 +59,7 @@ public:
 
     // A function that maps the connector number (P1..P16) to the value of
     // the corresponding SPI Pin SPI_P1..SPI_P16 constant.
-    static int SPIPinForConnector(int connector);
+    static Pin SPIPinForConnector(int connector);
 
     virtual ~MultiSPI() {}
 
@@ -77,7 +77,7 @@ public:
     // Set data byte for given gpio channel at given position in the
     // stream. "pos" needs to be in range [0 .. serial_bytes_per_stream)
     // Data is sent with next Send().
-    virtual void SetBufferedByte(int data_gpio, size_t pos, uint8_t data) = 0;
+    virtual void SetBufferedByte(Pin pin, size_t pos, uint8_t data) = 0;
 
     // Send data for all streams. Wait for completion. After SendBuffers()
     // has been called once, no new GPIOs can be registered.
@@ -96,7 +96,7 @@ public:
 //   Default is 4. Increase if your set-up can do more and you need the
 //   speed. Decrease if you see erratic behavior.
 MultiSPI *CreateDirectMultiSPI(int speed_mhz = 4,
-                               int clock_gpio = MultiSPI::SPI_CLOCK);
+                               MultiSPI::Pin clockPin = MultiSPI::SPI_CLOCK);
 
 // Factory to create a MultiSPI implementation that uses DMA to output.
 // Advantages:
@@ -106,7 +106,7 @@ MultiSPI *CreateDirectMultiSPI(int speed_mhz = 4,
 //   - Limited speed (1-2Mhz). Good for WS2801 which can't go faster
 //     anyway, but wasting potential with LPD6803 or APA102 that can go
 //     much faster.
-MultiSPI *CreateDMAMultiSPI(int clock_gpio = MultiSPI::SPI_CLOCK);
+MultiSPI *CreateDMAMultiSPI(MultiSPI::Pin clockPin = MultiSPI::SPI_CLOCK);
 }
 
 #endif  // SPIXELS_MULTI_SPI_H

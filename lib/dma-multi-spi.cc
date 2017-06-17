@@ -84,11 +84,11 @@ namespace spixels {
 namespace {
 class DMAMultiSPI : public MultiSPI {
 public:
-    explicit DMAMultiSPI(int clock_gpio);
+    explicit DMAMultiSPI(MultiSPI::Pin clockPin);
     virtual ~DMAMultiSPI();
 
     virtual bool RegisterDataGPIO(int gpio, size_t serial_byte_size);
-    virtual void SetBufferedByte(int data_gpio, size_t pos, uint8_t data);
+    virtual void SetBufferedByte(MultiSPI::Pin pin, size_t pos, uint8_t data);
     virtual void SendBuffers();
 
 private:
@@ -96,7 +96,7 @@ private:
 
     struct GPIOData;
     ft::GPIO gpio_;
-    const int clock_gpio_;
+    const MultiSPI::Pin clockPin_;
     size_t serial_byte_size_;   // Number of serial bytes to send.
 
     struct UncachedMemBlock alloced_;
@@ -116,13 +116,13 @@ struct DMAMultiSPI::GPIOData {
     uint32_t clr;
 };
 
-DMAMultiSPI::DMAMultiSPI(int clock_gpio)
-    : clock_gpio_(clock_gpio), serial_byte_size_(0),
+DMAMultiSPI::DMAMultiSPI(MultiSPI::Pin clockPin)
+    : clockPin_(clockPin), serial_byte_size_(0),
       gpio_dma_(NULL), gpio_shadow_(NULL) {
     alloced_.mem = NULL;
     bool success = gpio_.Init();
     assert(success);  // gpio couldn't be initialized
-    success = gpio_.AddOutput(clock_gpio);
+    success = gpio_.AddOutput(clockPin);
     assert(success);  // clock pin not valid
 }
 
@@ -165,9 +165,9 @@ bool DMAMultiSPI::RegisterDataGPIO(int gpio, size_t requested_bytes) {
         // Even: data, clock low; Uneven: clock pos edge
         for (int i = prev_gpio_end; i < gpio_operations; ++i) {
             if (i % 2 == 0)
-                gpio_shadow_[i].clr = (1<<clock_gpio_);
+                gpio_shadow_[i].clr = (1<<clockPin_);
             else
-                gpio_shadow_[i].set = (1<<clock_gpio_);
+                gpio_shadow_[i].set = (1<<clockPin_);
         }
     }
 
@@ -218,17 +218,27 @@ void DMAMultiSPI::FinishRegistration() {
     dma_channel_ = (struct dma_channel_header*)(dmaBase + 0x100 * DMA_CHANNEL);
 }
 
-void DMAMultiSPI::SetBufferedByte(int data_gpio, size_t pos, uint8_t data) {
+void DMAMultiSPI::SetBufferedByte(MultiSPI::Pin pin, size_t pos, uint8_t data)
+{
     assert(pos < serial_byte_size_);
-    GPIOData *buffer_pos = gpio_shadow_ + 2 * 8 * pos;
-    for (uint8_t bit = 0x80; bit; bit >>= 1, buffer_pos += 2) {
-        if (data & bit) {   // set
-            buffer_pos->set |= (1 << data_gpio);
-            buffer_pos->clr &= ~(1 << data_gpio);
-        } else {            // reset
-            buffer_pos->set &= ~(1 << data_gpio);
-            buffer_pos->clr |= (1 << data_gpio);
+
+	uint32_t		const pinBit = 1 << pin;
+	uint32_t		const pinNotBit = ~pinBit;
+    GPIOData*		buffer_pos = gpio_shadow_ + 2 * 8 * pos;
+    
+    for (uint8_t bit = 0x80; bit != 0; bit >>= 1)
+    {
+        if (data & bit)
+        {   // set
+            buffer_pos->set |= pinBit;
+            buffer_pos->clr &= pinNotBit;
         }
+        else
+        {            // reset
+            buffer_pos->set &= pinNotBit;
+            buffer_pos->clr |= pinBit;
+        }
+        buffer_pos += 2;
     }
 }
 
@@ -253,7 +263,7 @@ void DMAMultiSPI::SendBuffers() {
 
 
 // Public interface
-MultiSPI *CreateDMAMultiSPI(int clock_gpio) {
-    return new DMAMultiSPI(clock_gpio);
+MultiSPI *CreateDMAMultiSPI(MultiSPI::Pin clockPin) {
+    return new DMAMultiSPI(clockPin);
 }
 }  // namespace spixels

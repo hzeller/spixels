@@ -21,6 +21,7 @@
 #define SPIXELS_LED_STRIP_H
 
 #include <stdint.h>
+#include <algorithm>
 
 #include "multi-spi.h"
 
@@ -52,8 +53,8 @@ public:
     virtual ~LEDStrip();
 
     // Return number of attached LEDs.
-    inline int count() const { return count_; }
-
+    inline int pixelCount() const { return pixelCount_; }
+/*
     // Set pixel color. Input it RGB, output is luminance corrected
     // you don't have to apply pre-correction.
     // This is typically the function to use.
@@ -73,36 +74,93 @@ public:
     // Brightness change will take effect with next SendBuffers().
     void SetBrightness(uint8_t brigthness);
     inline uint8_t brightness() const { return brightness_; }
+*/
+	// The following methods provide different ways of setting a pixel's value:
+	// The "8" methods accept RGB components as bytes.  If the gammaTable is non-NULL
+	// these values index the table to get 16-bit values, which are passed to the "16" method.
+	// The "16" methods accept values normalized to 0xFFFF.  (max value == 0xFFFF)
+	// the "brightnessScale" field is normalized to 0x10000 (can be above or below this)
+	// the gammaTable array is 256 16-bit numbers, each normalized to 0xFFFF
+	// brightnessScale is applied AFTER the gammaTable.
+	
+	// Most subclasses will simply use the high 8 bits in their implementations of these methods.
+	// Others, such as APA102LedStrip will use all the bits to 
 
-    // Set the raw, linear RGB value as provided by the LED strip, normalized
-    // to the range [0 .. 0xFFFF]. This is LED-Strip dependent.
-    //
-    // The range is always [0 .. 0xFFFF], but the implementation internally
-    // scales it to whatever the hardware can do (LPD6803 only uses the
-    // 5 Most significant bits, while APA102 can provide up to 12 bit
-    // resolution depending on the circumstances).
-    //
-    // Note, this is the _linear_ range provided by the RGB strip as
-    // opposed to the luminance corrected RGB value in SetPixel(). So only
-    // use if you need the direct values.
-    virtual void SetLinearValues(int pos,
-                                 uint16_t r, uint16_t g, uint16_t b) = 0;
+    virtual void SetPixel8(int pixelIndex,
+							uint8_t red, uint8_t green, uint8_t blue) = 0;
+    virtual void SetPixel16(int pixelIndex,
+							uint16_t red, uint16_t green, uint16_t blue) = 0;
+	virtual void SetPixel8(int pixelIndex,
+							uint8_t red, uint8_t green, uint8_t blue,
+							uint32_t brightnessScale)
+	{
+		// This default implementation will do for most subclasses, not for APA102
+    	if (brightnessScale > 0x10000)
+    	{
+    		red = (uint8_t)std::min(red * brightnessScale / 0x10000, (uint32_t)0xFF);
+    		green = (uint8_t)std::min(green * brightnessScale / 0x10000, (uint32_t)0xFF);
+    		blue = (uint8_t)std::min(blue * brightnessScale / 0x10000, (uint32_t)0xFF);
+    	}
+    	else if (brightnessScale < 0x10000)
+    	{
+    		red = (uint8_t)(red * brightnessScale / 0x10000);
+    		green = (uint8_t)(green * brightnessScale / 0x10000);
+    		blue = (uint8_t)(blue * brightnessScale / 0x10000);
+    	}
+    	SetPixel8(pixelIndex, red, green, blue);
+	}
+    virtual void SetPixel16(int pixelIndex,
+                            uint16_t red, uint16_t green, uint16_t blue,
+                            uint32_t brightnessScale)
+	{
+		// This default implementation will do for most subclasses, not for APA102
+    	if (brightnessScale > 0x10000)
+    	{
+    		red = (uint16_t)std::min(red * brightnessScale / 0x10000, (uint32_t)0xFFFF);
+    		green = (uint16_t)std::min(green * brightnessScale / 0x10000, (uint32_t)0xFFFF);
+    		blue = (uint16_t)std::min(blue * brightnessScale / 0x10000, (uint32_t)0xFFFF);
+    	}
+    	else if (brightnessScale < 0x10000)
+    	{
+    		red = (uint16_t)(red * brightnessScale / 0x10000);
+    		green = (uint16_t)(green * brightnessScale / 0x10000);
+    		blue = (uint16_t)(blue * brightnessScale / 0x10000);
+    	}
+    	SetPixel16(pixelIndex, red, green, blue);
+	}
+    void SetPixel8(int pixelIndex, uint8_t red, uint8_t green, uint8_t blue,
+    				uint16_t const gammaTable[256], uint32_t brightnessScale)
+    {
+    	if (gammaTable)
+    	{
+	    	SetPixel16(pixelIndex,
+    					gammaTable[red], gammaTable[green], gammaTable[blue],
+    					brightnessScale);
+	    }
+	    else
+	    {
+	    	SetPixel8(pixelIndex, red, green, blue, brightnessScale);
+	    }
+    }
+    
 protected:
-    LEDStrip(int count);
+    LEDStrip(int pixelCount);
 
-    const int count_;
+    const int pixelCount_;
+/*
     RGBc *const values_;
     uint8_t brightness_;
+*/
 };
 
 // Factories for various LED strips.
 // Parameters
 // "spi"       The MultiSPI instance
 // "connector" The connector on the breakout board, such as MultiSPI::SPI_P1
-// "count"     Number of LEDs.
-LEDStrip *CreateWS2801Strip(MultiSPI *spi, int connector, int count);
-LEDStrip *CreateLPD6803Strip(MultiSPI *spi, int connector, int count);
-LEDStrip *CreateAPA102Strip(MultiSPI *spi, int connector, int count);
+// "pixelCount"     Number of LEDs.
+LEDStrip *CreateWS2801Strip(MultiSPI *spi, MultiSPI::Pin pin, int pixelCount);
+LEDStrip *CreateLPD6803Strip(MultiSPI *spi, MultiSPI::Pin pin, int pixelCount);
+LEDStrip *CreateAPA102Strip(MultiSPI *spi, MultiSPI::Pin pin, int pixelCount);
 }
 
 #endif // SPIXELS_LED_STRIP_H
