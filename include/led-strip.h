@@ -70,11 +70,11 @@ public:
     // for the eye.
     // This will be only having a somewhat pleasing result for LED strips with
     // higher PWM resolution (such as APA102).
-    //
-    // Brightness change will take effect with next SendBuffers().
-    void SetBrightness(uint8_t brigthness);
-    inline uint8_t brightness() const { return brightness_; }
 */
+	// brightnessScale16 is 0x10000 for no change in brightness
+    void SetBrightnessScale16(uint32_t brigthnessScale);
+    inline uint32_t brightnessScale16() const { return brightnessScale16_; }
+    
 	// The following methods provide different ways of setting a pixel's value:
 	// The "8" methods accept RGB components as bytes.  If the gammaTable is non-NULL
 	// these values index the table to get 16-bit values, which are passed to the "16" method.
@@ -86,60 +86,26 @@ public:
 	// Most subclasses will simply use the high 8 bits in their implementations of these methods.
 	// Others, such as APA102LedStrip will use all the bits to 
 
-    virtual void SetPixel8(int pixelIndex,
-							uint8_t red, uint8_t green, uint8_t blue) = 0;
+    virtual void SetPixel8(int pixelIndex, uint8_t red, uint8_t green, uint8_t blue) = 0;
     virtual void SetPixel16(int pixelIndex,
-							uint16_t red, uint16_t green, uint16_t blue) = 0;
-	virtual void SetPixel8(int pixelIndex,
-							uint8_t red, uint8_t green, uint8_t blue,
-							uint32_t brightnessScale)
+							uint16_t red, uint16_t green, uint16_t blue)
 	{
 		// This default implementation will do for most subclasses, not for APA102
-    	if (brightnessScale > 0x10000)
-    	{
-    		red = (uint8_t)std::min(red * brightnessScale / 0x10000, (uint32_t)0xFF);
-    		green = (uint8_t)std::min(green * brightnessScale / 0x10000, (uint32_t)0xFF);
-    		blue = (uint8_t)std::min(blue * brightnessScale / 0x10000, (uint32_t)0xFF);
-    	}
-    	else if (brightnessScale < 0x10000)
-    	{
-    		red = (uint8_t)(red * brightnessScale / 0x10000);
-    		green = (uint8_t)(green * brightnessScale / 0x10000);
-    		blue = (uint8_t)(blue * brightnessScale / 0x10000);
-    	}
-    	SetPixel8(pixelIndex, red, green, blue);
-	}
-    virtual void SetPixel16(int pixelIndex,
-                            uint16_t red, uint16_t green, uint16_t blue,
-                            uint32_t brightnessScale)
-	{
-		// This default implementation will do for most subclasses, not for APA102
-    	if (brightnessScale > 0x10000)
-    	{
-    		red = (uint16_t)std::min(red * brightnessScale / 0x10000, (uint32_t)0xFFFF);
-    		green = (uint16_t)std::min(green * brightnessScale / 0x10000, (uint32_t)0xFFFF);
-    		blue = (uint16_t)std::min(blue * brightnessScale / 0x10000, (uint32_t)0xFFFF);
-    	}
-    	else if (brightnessScale < 0x10000)
-    	{
-    		red = (uint16_t)(red * brightnessScale / 0x10000);
-    		green = (uint16_t)(green * brightnessScale / 0x10000);
-    		blue = (uint16_t)(blue * brightnessScale / 0x10000);
-    	}
-    	SetPixel16(pixelIndex, red, green, blue);
+		red = std::min((red + 0x7F) >> 8, 0xFF);
+		green = std::min((green + 0x7F) >> 8, 0xFF);
+		blue = std::min((blue + 0x7F) >> 8, 0xFF);
+		SetPixel8(pixelIndex, (uint8_t)red, (uint8_t)green, (uint8_t)blue);
 	}
     void SetPixel8(int pixelIndex, uint8_t red, uint8_t green, uint8_t blue,
-    				uint16_t const gammaTable[256], uint32_t brightnessScale)
+    				uint16_t const gammaTable[256])
     {
     	if (gammaTable)
     	{
-	    	SetPixel16(pixelIndex,
-    					gammaTable[red], gammaTable[green], gammaTable[blue],
-    					brightnessScale);
+	    	SetPixel16(pixelIndex, gammaTable[red], gammaTable[green], gammaTable[blue]);
 	    }
 	    else
 	    {
-	    	SetPixel8(pixelIndex, red, green, blue, brightnessScale);
+	    	SetPixel8(pixelIndex, red, green, blue);
 	    }
     }
     
@@ -147,9 +113,9 @@ protected:
     LEDStrip(int pixelCount);
 
     const int pixelCount_;
+    uint32_t brightnessScale16_;
 /*
     RGBc *const values_;
-    uint8_t brightness_;
 */
 };
 
