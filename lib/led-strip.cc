@@ -87,22 +87,33 @@ void LEDStrip::SetBrightness(uint8_t new_brightness) {
 }
 */
 
+
 namespace {
 
 
 /////////////////////////////////////////////////
 //#pragma mark - WS2801LedStrip:
 
-class WS2801LedStrip : public LEDStrip {
+#define WS_start_frame_bytes	0
+#define WS_pixel_bytes			3
+#define WS_end_frame_bytes		0
+
+class WS2801LedStrip : public LEDStrip
+{
 public:
     WS2801LedStrip(MultiSPI *spi, MultiSPI::Pin pin, int pixelCount)
-        : LEDStrip(pixelCount), spi_(spi), pin_(pin) {
-        spi_->RegisterDataGPIO(pin, pixelCount * 3);
+    : LEDStrip(pixelCount)
+    , spi_(spi)
+    , pin_(pin)
+    {
+        const size_t frame_bytes = WS_start_frame_bytes + WS_pixel_bytes * pixelCount + WS_end_frame_bytes;
+        
+        spi_->RegisterDataGPIO(pin, frame_bytes);
     }
 
     virtual void SetPixel8(uint32_t pixel_index, uint8_t red, uint8_t green, uint8_t blue)
     {
-    	uint32_t	const scale = brightnessScale16_;
+    	uint32_t		const scale = brightnessScale16_;
     	
     	if (scale > 0x10000)
     	{
@@ -116,27 +127,41 @@ public:
     		green = (uint8_t)(green * scale / 0x10000);
     		blue = (uint8_t)(blue * scale / 0x10000);
     	}
-        spi_->SetBufferedByte(pin_, pixel_index + 0, red);
-        spi_->SetBufferedByte(pin_, pixel_index + 1, green);
-        spi_->SetBufferedByte(pin_, pixel_index + 2, blue);
+
+		uint32_t		const offset = WS_start_frame_bytes + WS_pixel_bytes * pixel_index;
+
+        spi_->SetBufferedByte(pin_, offset + 0, red);
+        spi_->SetBufferedByte(pin_, offset + 1, green);
+        spi_->SetBufferedByte(pin_, offset + 2, blue);
     }
 
 private:
-    MultiSPI *const spi_;
-    const MultiSPI::Pin pin_;
+    MultiSPI*		const spi_;
+    MultiSPI::Pin	const pin_;
 };
 
 
 /////////////////////////////////////////////////
 //#pragma mark - LPD6803LedStrip:
 
-class LPD6803LedStrip : public LEDStrip {
+#define LPD_start_frame_bytes	4
+#define LPD_pixel_bytes			2
+#define LPD_end_frame_bytes		4
+
+class LPD6803LedStrip : public LEDStrip
+{
 public:
     LPD6803LedStrip(MultiSPI *spi, MultiSPI::Pin pin, int pixelCount)
-        : LEDStrip(pixelCount), spi_(spi), pin_(pin) {
-        const size_t frame_size = 4 + 2 * pixelCount + 4;
-        spi_->RegisterDataGPIO(pin, frame_size);
+    : LEDStrip(pixelCount)
+    , spi_(spi)
+    , pin_(pin)
+    {
+        const size_t frame_bytes = LPD_start_frame_bytes + LPD_pixel_bytes * pixelCount + LPD_end_frame_bytes;
+        
+        spi_->RegisterDataGPIO(pin, frame_bytes);
 
+		// These zeroings shouldn't be required since RegisterDataGPIO() clears all bytes
+		// But until it can be tested, we leave this in.
         // Four zero bytes as start-bytes for lpd6803
         spi_->SetBufferedByte(pin_, 0, 0x00);
         spi_->SetBufferedByte(pin_, 1, 0x00);
@@ -150,7 +175,7 @@ public:
 
     virtual void SetPixel8(uint32_t pixel_index, uint8_t red, uint8_t green, uint8_t blue)
     {
-    	uint32_t	const scale = brightnessScale16_;
+    	uint32_t		const scale = brightnessScale16_;
     	
     	if (scale > 0x10000)
     	{
@@ -172,20 +197,24 @@ public:
         data |= (green >> 3) <<  5;
         data |= (blue >> 3) <<  0;
 
-		int				const offset = 4 + 2 * pixel_index;
+		uint32_t		const offset = LPD_start_frame_bytes + LPD_pixel_bytes * pixel_index;
 		
         spi_->SetBufferedByte(pin_, offset + 0, data >> 8);
         spi_->SetBufferedByte(pin_, offset + 1, data & 0xFF);
     }
 
 private:
-    MultiSPI *const spi_;
-    const MultiSPI::Pin pin_;
+    MultiSPI*		const spi_;
+    MultiSPI::Pin	const pin_;
 };
 
 
 /////////////////////////////////////////////////
 //#pragma mark - APA102LedStrip:
+
+#define APA_start_frame_bytes	4
+#define APA_pixel_bytes			4
+#define APA_latch_frame_bytes	4	// extra end-frame bytes for compatibility with SK9822 chips
 
 class APA102LedStrip : public LEDStrip
 {
@@ -195,12 +224,11 @@ public:
 	, spi_(spi)
 	, pin_(pin)
 	{
-        const size_t startframe_size = 4;
-        const size_t data_size = 4 * pixelCount;
-        const size_t endframe_size = 4 + (pixelCount + 15) / 16;
-        const size_t frame_size = startframe_size + data_size + endframe_size;
+        const size_t pixels_bytes = APA_pixel_bytes * pixelCount;
+        const size_t end_frame_bytes = APA_latch_frame_bytes + (pixelCount + 15) / 16;
+        const size_t frame_bytes = APA_start_frame_bytes + pixels_bytes + end_frame_bytes;
 
-        spi_->RegisterDataGPIO(pin, frame_size);
+        spi_->RegisterDataGPIO(pin, frame_bytes);
 
 		uint32_t		index;
 		
@@ -227,7 +255,7 @@ public:
         }
 
         // We need a couple of more bits clocked at the end.
-        for (size_t tail = startframe_size + data_size; tail < frame_size; ++tail)
+        for (size_t tail = APA_start_frame_bytes + pixels_bytes; tail < frame_bytes; ++tail)
         {
             spi_->SetBufferedByte(pin_, tail, 0xff);	// endframe should be 0s, not 1s!
         }
@@ -283,7 +311,7 @@ public:
     		blue = (uint8_t)(blue * scale / 0x10000);
     	}
 
-        int				const offset = 4 + 4 * pixel_index;
+        int				const offset = APA_start_frame_bytes + APA_pixel_bytes * pixel_index;
 
 		spi_->SetBufferedByte(pin_, offset + 0, hardwareBrightnessByte_);
         spi_->SetBufferedByte(pin_, offset + 1, blue);
@@ -315,7 +343,7 @@ public:
 		green = (uint16_t)(green * inverse8 / 0x10000);
 		blue = (uint16_t)(blue * inverse8 / 0x10000);
 		
-        int				const offset = 4 + 4 * pixel_index;
+        int				const offset = APA_start_frame_bytes + APA_pixel_bytes * pixel_index;
 
 		spi_->SetBufferedByte(pin_, offset + 0, (uint8_t)(0xE0 | hardwareScale));
         spi_->SetBufferedByte(pin_, offset + 1, (uint8_t)blue);
@@ -331,7 +359,9 @@ private:
    	uint32_t		hardwareScaleInverseTable8_[32];	// used by SetPixel16() to quickly divide
 };
 
+
 }  // anonymous namespace
+
 
 // Public interface
 LEDStrip *CreateWS2801Strip(MultiSPI *spi, MultiSPI::Pin pin, int pixelCount) {
@@ -343,4 +373,6 @@ LEDStrip *CreateLPD6803Strip(MultiSPI *spi, MultiSPI::Pin pin, int pixelCount) {
 LEDStrip *CreateAPA102Strip(MultiSPI *spi, MultiSPI::Pin pin, int pixelCount) {
     return new APA102LedStrip(spi, pin, pixelCount);
 }
+
+
 }  // spixels namespace

@@ -117,8 +117,8 @@ void DirectMultiSPI::SetBufferedByte(MultiSPI::Pin pin, size_t pos, uint8_t data
 	assert(pos < size_);
 	if (pos < size_)
 	{
-		uint32_t		const pinBit = 1 << pin;
-		uint32_t		const pinNotBit = ~pinBit;
+		uint32_t		const pin_bit = 1 << pin;
+		uint32_t		const pin_not_bit = ~pin_bit;
 		uint32_t*		buffer_pos = gpio_data_ + 8 * pos;
 
 #if 1
@@ -126,32 +126,32 @@ void DirectMultiSPI::SetBufferedByte(MultiSPI::Pin pin, size_t pos, uint8_t data
 		{
 			if (data & bit)
 			{   // set
-				*buffer_pos |= pinBit;
+				*buffer_pos |= pin_bit;
 			}
 			else
 			{  // reset
-				*buffer_pos &= pinNotBit;
+				*buffer_pos &= pin_not_bit;
 			}
 			buffer_pos++;
 		}
 #else
 		// This unwound loop has no conditional branches, no broken pipeline!
 		// Yet it goes slower than the above loop on the Pi.  Go figure...
-		buffer_pos[7] = (buffer_pos[7] & pinNotBit) | ((data & 1) << pin);
+		buffer_pos[7] = (buffer_pos[7] & pin_not_bit) | ((data & 1) << pin);
 		data >>= 1;
-		buffer_pos[6] = (buffer_pos[6] & pinNotBit) | ((data & 1) << pin);
+		buffer_pos[6] = (buffer_pos[6] & pin_not_bit) | ((data & 1) << pin);
 		data >>= 1;
-		buffer_pos[5] = (buffer_pos[5] & pinNotBit) | ((data & 1) << pin);
+		buffer_pos[5] = (buffer_pos[5] & pin_not_bit) | ((data & 1) << pin);
 		data >>= 1;
-		buffer_pos[4] = (buffer_pos[4] & pinNotBit) | ((data & 1) << pin);
+		buffer_pos[4] = (buffer_pos[4] & pin_not_bit) | ((data & 1) << pin);
 		data >>= 1;
-		buffer_pos[3] = (buffer_pos[3] & pinNotBit) | ((data & 1) << pin);
+		buffer_pos[3] = (buffer_pos[3] & pin_not_bit) | ((data & 1) << pin);
 		data >>= 1;
-		buffer_pos[2] = (buffer_pos[2] & pinNotBit) | ((data & 1) << pin);
+		buffer_pos[2] = (buffer_pos[2] & pin_not_bit) | ((data & 1) << pin);
 		data >>= 1;
-		buffer_pos[1] = (buffer_pos[1] & pinNotBit) | ((data & 1) << pin);
+		buffer_pos[1] = (buffer_pos[1] & pin_not_bit) | ((data & 1) << pin);
 		data >>= 1;
-		buffer_pos[0] = (buffer_pos[0] & pinNotBit) | ((data & 1) << pin);
+		buffer_pos[0] = (buffer_pos[0] & pin_not_bit) | ((data & 1) << pin);
 #endif
 	}
 }
