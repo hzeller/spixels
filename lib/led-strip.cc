@@ -100,7 +100,7 @@ public:
         spi_->RegisterDataGPIO(pin, pixelCount * 3);
     }
 
-    virtual void SetPixel8(int pixelIndex, uint8_t red, uint8_t green, uint8_t blue)
+    virtual void SetPixel8(uint32_t pixel_index, uint8_t red, uint8_t green, uint8_t blue)
     {
     	uint32_t	const scale = brightnessScale16_;
     	
@@ -116,9 +116,9 @@ public:
     		green = (uint8_t)(green * scale / 0x10000);
     		blue = (uint8_t)(blue * scale / 0x10000);
     	}
-        spi_->SetBufferedByte(pin_, pixelIndex + 0, red);
-        spi_->SetBufferedByte(pin_, pixelIndex + 1, green);
-        spi_->SetBufferedByte(pin_, pixelIndex + 2, blue);
+        spi_->SetBufferedByte(pin_, pixel_index + 0, red);
+        spi_->SetBufferedByte(pin_, pixel_index + 1, green);
+        spi_->SetBufferedByte(pin_, pixel_index + 2, blue);
     }
 
 private:
@@ -134,21 +134,21 @@ class LPD6803LedStrip : public LEDStrip {
 public:
     LPD6803LedStrip(MultiSPI *spi, MultiSPI::Pin pin, int pixelCount)
         : LEDStrip(pixelCount), spi_(spi), pin_(pin) {
-        const size_t bytes_needed = 4 + 2 * pixelCount + 4;
-        spi_->RegisterDataGPIO(pin, bytes_needed);
+        const size_t frame_size = 4 + 2 * pixelCount + 4;
+        spi_->RegisterDataGPIO(pin, frame_size);
 
         // Four zero bytes as start-bytes for lpd6803
         spi_->SetBufferedByte(pin_, 0, 0x00);
         spi_->SetBufferedByte(pin_, 1, 0x00);
         spi_->SetBufferedByte(pin_, 2, 0x00);
         spi_->SetBufferedByte(pin_, 3, 0x00);
-        for (int pos = 0; pos < pixelCount; ++pos)
+        for (int pixel_index = 0; pixel_index < pixelCount; ++pixel_index)
         {
-            SetPixel8(pos, 0, 0, 0);     // Initialize all top-bits.
+            SetPixel8(pixel_index, 0, 0, 0);     // Initialize all top-bits.
         }
     }
 
-    virtual void SetPixel8(int pixelIndex, uint8_t red, uint8_t green, uint8_t blue)
+    virtual void SetPixel8(uint32_t pixel_index, uint8_t red, uint8_t green, uint8_t blue)
     {
     	uint32_t	const scale = brightnessScale16_;
     	
@@ -172,7 +172,7 @@ public:
         data |= (green >> 3) <<  5;
         data |= (blue >> 3) <<  0;
 
-		int				const offset = 4 + 2 * pixelIndex;
+		int				const offset = 4 + 2 * pixel_index;
 		
         spi_->SetBufferedByte(pin_, offset + 0, data >> 8);
         spi_->SetBufferedByte(pin_, offset + 1, data & 0xFF);
@@ -196,12 +196,24 @@ public:
 	, pin_(pin)
 	{
         const size_t startframe_size = 4;
-        const size_t data_size = 4*pixelCount;
-        const size_t endframe_size = (pixelCount+15) / 16;
-        const size_t bytes_needed = startframe_size + data_size + endframe_size;
+        const size_t data_size = 4 * pixelCount;
+        const size_t endframe_size = 4 + (pixelCount + 15) / 16;
+        const size_t frame_size = startframe_size + data_size + endframe_size;
 
-        spi_->RegisterDataGPIO(pin, bytes_needed);
+        spi_->RegisterDataGPIO(pin, frame_size);
 
+		uint32_t		index;
+		
+		index = 0;
+		hardwareScaleInverseTable8_[0] = 0;
+		while (++index < 32u)
+		{
+			hardwareScaleInverseTable8_[index] = (32u << 8) / index;
+		}
+		componentsScale16_ = 0x10000;
+		hardwareBrightnessByte_ = 0x1F;
+
+/*		These zeroings aren't needed since RegisterDataGPIO() zeros all bytes
         // Four zero bytes as start-bytes
         spi_->SetBufferedByte(pin_, 0, 0x00);
         spi_->SetBufferedByte(pin_, 1, 0x00);
@@ -209,79 +221,84 @@ public:
         spi_->SetBufferedByte(pin_, 3, 0x00);
 
         // Make sure the start bits are properly set.
-        for (int i = 0; i < pixelCount; ++i)
+        for (int pixel_index = 0; pixel_index < pixelCount; ++pixel_index)
         {
-            SetPixel8(i, 0, 0, 0);
+            SetPixel8(pixel_index, 0, 0, 0);
         }
 
-		// TODO:  Add "reset frame" to support APA102 clone chip
-		
         // We need a couple of more bits clocked at the end.
-        for (size_t tail = startframe_size + data_size; tail < bytes_needed; ++tail)
+        for (size_t tail = startframe_size + data_size; tail < frame_size; ++tail)
         {
-            spi_->SetBufferedByte(pin_, tail, 0xff);
+            spi_->SetBufferedByte(pin_, tail, 0xff);	// endframe should be 0s, not 1s!
         }
-
-		uint32_t		index;
-		
-		index = 0;
-		hardwareMultiplierInverseTable_[0] = 0;
-		while (++index < 32)
-		{
-			hardwareMultiplierInverseTable_[index] = (0x1F << 8) / index;
-		}
+*/
     }
 
-    virtual void SetPixel8(int pixelIndex, uint8_t red, uint8_t green, uint8_t blue)
+	virtual void SetBrightnessScale16(uint32_t brightnessScale16)
+	{
+		brightnessScale16_ = brightnessScale16;
+		
+    	if (brightnessScale16 < 0x10000)
+    	{
+    		uint32_t		hardwareScale5;
+    		
+    		// brightnessScale16 is 0x10000 for no scaling.
+    		// For APA102, we squeeze this range down to 0...32.
+    		// We fudge 32 into 31 so that 50%, 25%, and other common scales have pretty math.
+    		// We disallow 0 since that would just result in blackness.
+    		hardwareScale5 = brightnessScale16 >> 11;
+    		hardwareScale5 = std::min(hardwareScale5, 31u);
+    		hardwareScale5 = std::max(hardwareScale5, 1u);
+    		hardwareBrightnessByte_ = (uint8_t)hardwareScale5 | 0xE0;
+    		
+    		// componentsScale16_ scales down the compoent values directly.
+    		// It provides more precision, in addition to the crude, 5-bit hardware brightness.
+    		componentsScale16_ = brightnessScale16 * 32u / hardwareScale5;
+    	}
+    	else
+    	{
+    		// If scaling up or not scaling, don't use any hardware scaling.
+    		// Just let componentsScale16_ do it.
+    		hardwareBrightnessByte_ = 0xFF;
+    		componentsScale16_ = brightnessScale16;
+    	}
+//		fprintf(stderr, "SetBrightnessScale16() - hardware=0x%02X, components=0x%04X\n",
+//				hardwareBrightnessByte_ & 0x1F, componentsScale16_);
+	}
+	
+    virtual void SetPixel8(uint32_t pixel_index, uint8_t red, uint8_t green, uint8_t blue)
     {
-    	uint32_t		scale;
-   		uint32_t		hardwareMultiplier;
+    	uint32_t		const scale = componentsScale16_;
     	
-    	scale = brightnessScale16_;
     	if (scale > 0x10000)
     	{
-    		red = (uint8_t)std::min(red * scale / 0x10000, (uint32_t)0xFF);
-    		green = (uint8_t)std::min(green * scale / 0x10000, (uint32_t)0xFF);
-    		blue = (uint8_t)std::min(blue * scale / 0x10000, (uint32_t)0xFF);
-    		hardwareMultiplier = 0x1F;
+    		red = (uint8_t)std::min(red * scale / 0x10000, 0xFFu);
+    		green = (uint8_t)std::min(green * scale / 0x10000, 0xFFu);
+    		blue = (uint8_t)std::min(blue * scale / 0x10000, 0xFFu);
     	}
     	else if (scale < 0x10000)
     	{
-    		hardwareMultiplier = (scale + 0x07FF) >> 11;
-    		if (hardwareMultiplier < 0x01)
-    		{
-    			hardwareMultiplier = 0x01;
-    		}
-    		else if (hardwareMultiplier > 0x1F)
-    		{
-    			hardwareMultiplier = 0x1F;
-    		}
-    		scale = (scale * hardwareMultiplierInverseTable_[hardwareMultiplier]) >> 8;
     		red = (uint8_t)(red * scale / 0x10000);
     		green = (uint8_t)(green * scale / 0x10000);
     		blue = (uint8_t)(blue * scale / 0x10000);
     	}
-    	else
-    	{
-    		hardwareMultiplier = 0x1F;
-    	}
 
-        int				const offset = 4 + 4 * pixelIndex;
+        int				const offset = 4 + 4 * pixel_index;
 
-		spi_->SetBufferedByte(pin_, offset + 0, (uint8_t)(0xE0 | hardwareMultiplier));
+		spi_->SetBufferedByte(pin_, offset + 0, hardwareBrightnessByte_);
         spi_->SetBufferedByte(pin_, offset + 1, blue);
         spi_->SetBufferedByte(pin_, offset + 2, green);
         spi_->SetBufferedByte(pin_, offset + 3, red);
     }
-    virtual void SetPixel16(int pixelIndex, uint16_t red, uint16_t green, uint16_t blue)
+    virtual void SetPixel16(uint32_t pixel_index, uint16_t red, uint16_t green, uint16_t blue)
     {
     	uint32_t		const scale = brightnessScale16_;
 
     	if (scale > 0x10000)
     	{
-    		red = (uint16_t)std::min(red * scale / 0x10000, (uint32_t)0xFFFF);
-    		green = (uint16_t)std::min(green * scale / 0x10000, (uint32_t)0xFFFF);
-    		blue = (uint16_t)std::min(blue * scale / 0x10000, (uint32_t)0xFFFF);
+    		red = (uint16_t)std::min(red * scale / 0x10000, 0xFFFFu);
+    		green = (uint16_t)std::min(green * scale / 0x10000, 0xFFFFu);
+    		blue = (uint16_t)std::min(blue * scale / 0x10000, 0xFFFFu);
     	}
     	else if (scale < 0x10000)
     	{
@@ -290,17 +307,17 @@ public:
     		blue = (uint16_t)(blue * scale / 0x10000);
     	}
 
-		uint16_t		const maxHigh5Bits = std::max(std::max(red, green), blue) >> 11;
-		uint16_t		const hardwareMultiplier = std::min(maxHigh5Bits + 1, 31);
-		uint32_t		const inverse8 = hardwareMultiplierInverseTable_[hardwareMultiplier];
+		uint32_t		const maxHigh5Bits = std::max(std::max(red, green), blue) >> 11;
+		uint32_t		const hardwareScale = std::min(maxHigh5Bits + 1u, 31u);
+		uint32_t		const inverse8 = hardwareScaleInverseTable8_[hardwareScale];
 		
 		red = (uint16_t)(red * inverse8 / 0x10000);
 		green = (uint16_t)(green * inverse8 / 0x10000);
 		blue = (uint16_t)(blue * inverse8 / 0x10000);
 		
-        int				const offset = 4 + 4 * pixelIndex;
+        int				const offset = 4 + 4 * pixel_index;
 
-		spi_->SetBufferedByte(pin_, offset + 0, (uint8_t)(0xE0 | hardwareMultiplier));
+		spi_->SetBufferedByte(pin_, offset + 0, (uint8_t)(0xE0 | hardwareScale));
         spi_->SetBufferedByte(pin_, offset + 1, (uint8_t)blue);
         spi_->SetBufferedByte(pin_, offset + 2, (uint8_t)green);
         spi_->SetBufferedByte(pin_, offset + 3, (uint8_t)red);
@@ -309,7 +326,9 @@ public:
 private:
     MultiSPI*		const spi_;
     MultiSPI::Pin	const pin_;
-   	uint32_t		hardwareMultiplierInverseTable_[32];
+    uint32_t		componentsScale16_;					// scales component values before sending to spi_
+    uint8_t			hardwareBrightnessByte_;			// byte sent to APA102 when SetPixel8() used
+   	uint32_t		hardwareScaleInverseTable8_[32];	// used by SetPixel16() to quickly divide
 };
 
 }  // anonymous namespace

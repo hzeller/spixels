@@ -72,40 +72,38 @@ public:
     // higher PWM resolution (such as APA102).
 */
 	// brightnessScale16 is 0x10000 for no change in brightness
-    void SetBrightnessScale16(uint32_t brigthnessScale);
-    inline uint32_t brightnessScale16() const { return brightnessScale16_; }
+	// SetBrightnessScale16() is virtual so that subclasses can prepare special data for scaling
+	virtual void SetBrightnessScale16(uint32_t brightnessScale16)
+    { brightnessScale16_ = brightnessScale16; }
+    uint32_t brightnessScale16() const
+    { return brightnessScale16_; }
     
 	// The following methods provide different ways of setting a pixel's value:
 	// The "8" methods accept RGB components as bytes.  If the gammaTable is non-NULL
 	// these values index the table to get 16-bit values, which are passed to the "16" method.
 	// The "16" methods accept values normalized to 0xFFFF.  (max value == 0xFFFF)
-	// the "brightnessScale" field is normalized to 0x10000 (can be above or below this)
 	// the gammaTable array is 256 16-bit numbers, each normalized to 0xFFFF
-	// brightnessScale is applied AFTER the gammaTable.
-	
-	// Most subclasses will simply use the high 8 bits in their implementations of these methods.
-	// Others, such as APA102LedStrip will use all the bits to 
-
-    virtual void SetPixel8(int pixelIndex, uint8_t red, uint8_t green, uint8_t blue) = 0;
-    virtual void SetPixel16(int pixelIndex,
+	// brightnessScale16_ is applied AFTER the gammaTable.
+    virtual void SetPixel8(uint32_t pixel_index, uint8_t red, uint8_t green, uint8_t blue) = 0;
+    virtual void SetPixel16(uint32_t pixel_index,
 							uint16_t red, uint16_t green, uint16_t blue)
 	{
 		// This default implementation will do for most subclasses, not for APA102
 		red = std::min((red + 0x7F) >> 8, 0xFF);
 		green = std::min((green + 0x7F) >> 8, 0xFF);
 		blue = std::min((blue + 0x7F) >> 8, 0xFF);
-		SetPixel8(pixelIndex, (uint8_t)red, (uint8_t)green, (uint8_t)blue);
+		SetPixel8(pixel_index, (uint8_t)red, (uint8_t)green, (uint8_t)blue);
 	}
-    void SetPixel8(int pixelIndex, uint8_t red, uint8_t green, uint8_t blue,
+    void SetPixel8(uint32_t pixel_index, uint8_t red, uint8_t green, uint8_t blue,
     				uint16_t const gammaTable[256])
     {
     	if (gammaTable)
     	{
-	    	SetPixel16(pixelIndex, gammaTable[red], gammaTable[green], gammaTable[blue]);
+	    	SetPixel16(pixel_index, gammaTable[red], gammaTable[green], gammaTable[blue]);
 	    }
 	    else
 	    {
-	    	SetPixel8(pixelIndex, red, green, blue);
+	    	SetPixel8(pixel_index, red, green, blue);
 	    }
     }
     
