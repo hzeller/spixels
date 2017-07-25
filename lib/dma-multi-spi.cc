@@ -136,7 +136,7 @@ static int bytes_to_gpio_ops(size_t bytes) {
     // data and one to create a positive clock-edge.
     // For each byte, we have 8 bits.
     // Also, we need a single operation at the end of everything to set clk low.
-    return bytes * 8 * 2 + 1;
+    return (int)(bytes * 8 * 2 + 1);
 }
 
 bool DMAMultiSPI::RegisterDataGPIO(int gpio, size_t requested_bytes) {
@@ -194,12 +194,12 @@ void DMAMultiSPI::FinishRegistration() {
     for (int i = 0; i < control_blocks; ++i) {
         cb = (struct dma_cb*) ((uint8_t*)alloced_.mem + i * sizeof(dma_cb));
         if (previous) {
-            previous->next = UncachedMemBlock_to_physical(&alloced_, cb);
+            previous->next = (uint32_t)UncachedMemBlock_to_physical(&alloced_, cb);
         }
         const int n = remaining > kMaxOpsPerBlock ? kMaxOpsPerBlock : remaining;
         cb->info   = (DMA_CB_TI_SRC_INC | DMA_CB_TI_DEST_INC |
                       DMA_CB_TI_NO_WIDE_BURSTS | DMA_CB_TI_TDMODE);
-        cb->src    = UncachedMemBlock_to_physical(&alloced_, start_gpio);
+        cb->src    = (uint32_t)UncachedMemBlock_to_physical(&alloced_, start_gpio);
         cb->dst    = PHYSICAL_GPIO_BUS + GPIO_SET_OFFSET;
         cb->length = DMA_CB_TXFR_LEN_YLENGTH(n)
             | DMA_CB_TXFR_LEN_XLENGTH(sizeof(GPIOData));
@@ -247,7 +247,7 @@ void DMAMultiSPI::SendBuffers() {
     memcpy(gpio_dma_, gpio_shadow_, gpio_buffer_size_);
 
     dma_channel_->cs |= DMA_CS_END;
-    dma_channel_->cblock = UncachedMemBlock_to_physical(&alloced_, start_block_);
+    dma_channel_->cblock = (uint32_t)UncachedMemBlock_to_physical(&alloced_, start_block_);
     dma_channel_->cs = DMA_CS_PRIORITY(7) | DMA_CS_PANIC_PRIORITY(7) | DMA_CS_DISDEBUG;
     dma_channel_->cs |= DMA_CS_ACTIVE;
     while ((dma_channel_->cs & DMA_CS_ACTIVE)

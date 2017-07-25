@@ -75,7 +75,7 @@ private:
 
 DirectMultiSPI::DirectMultiSPI(int speed_mhz, MultiSPI::Pin clockPin)
 : clockPin_(clockPin)
-, write_repeat_(std::max(2, (int)roundf(30.0 / speed_mhz)))
+, write_repeat_(std::max(2, (int)roundf(30.0f / speed_mhz)))
 , size_(0)
 , gpio_data_(NULL)
 {
@@ -97,8 +97,8 @@ bool DirectMultiSPI::RegisterDataGPIO(int gpio, size_t serial_byte_size)
 {
     if (serial_byte_size > size_)
     {
-        const int prev_size = size_ * 8 * sizeof(uint32_t);
-        const int new_size = serial_byte_size * 8 * sizeof(uint32_t);
+        const size_t prev_size = size_ * 8 * sizeof(uint32_t);
+        const size_t new_size = serial_byte_size * 8 * sizeof(uint32_t);
         size_ = serial_byte_size;
 		if (gpio_data_ == NULL)
 		{

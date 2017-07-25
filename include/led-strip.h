@@ -71,47 +71,42 @@ public:
     // This will be only having a somewhat pleasing result for LED strips with
     // higher PWM resolution (such as APA102).
 */
-	// brightnessScale16 is 0x10000 for no change in brightness
+	// 0x10000 for no change in brightness
 	// SetBrightnessScale16() is virtual so that subclasses can prepare special data for scaling
-	virtual void SetBrightnessScale16(uint32_t brightnessScale16)
-    { brightnessScale16_ = brightnessScale16; }
-    uint32_t brightnessScale16() const
-    { return brightnessScale16_; }
+	void SetBrightnessScale16(uint32_t scale16)
+	{ SetBrightnessScale16(scale16, scale16, scale16); }
+	virtual void SetBrightnessScale16(uint32_t redScale16, uint32_t greenScale16, uint32_t blueScale16)
+    { redScale16_ = redScale16;
+      greenScale16_ = greenScale16;
+      blueScale16_ = blueScale16; }
+    uint32_t redScale16() const
+    { return redScale16_; }
+    uint32_t greenScale16() const
+    { return greenScale16_; }
+    uint32_t blueScale16() const
+    { return blueScale16_; }
     
 	// The following methods provide different ways of setting a pixel's value:
-	// The "8" methods accept RGB components as bytes.  If the gammaTable is non-NULL
-	// these values index the table to get 16-bit values, which are passed to the "16" method.
-	// The "16" methods accept values normalized to 0xFFFF.  (max value == 0xFFFF)
-	// the gammaTable array is 256 16-bit numbers, each normalized to 0xFFFF
-	// brightnessScale16_ is applied AFTER the gammaTable.
+	// The maximum value of a uint16_t component is 0xFFFF.  Most subclasses will just throw
+	// away the low byte.  APA102/SK9822 will make use of the extra bnits to set
+	// their "global brightness" values.
     virtual void SetPixel8(uint32_t pixel_index, uint8_t red, uint8_t green, uint8_t blue) = 0;
-    virtual void SetPixel16(uint32_t pixel_index,
-							uint16_t red, uint16_t green, uint16_t blue)
+    virtual void SetPixel16(uint32_t pixel_index, uint16_t red, uint16_t green, uint16_t blue)
 	{
-		// This default implementation will do for most subclasses, not for APA102
-		red = std::min((red + 0x7F) >> 8, 0xFF);
-		green = std::min((green + 0x7F) >> 8, 0xFF);
-		blue = std::min((blue + 0x7F) >> 8, 0xFF);
-		SetPixel8(pixel_index, (uint8_t)red, (uint8_t)green, (uint8_t)blue);
+		// This default implementation will do for most subclasses, not for APA102/SK9822
+		SetPixel8(pixel_index,
+					(uint8_t)std::min(((uint32_t)red + 0x7Fu) >> 8, 0xFFu),
+					(uint8_t)std::min(((uint32_t)green + 0x7Fu) >> 8, 0xFFu),
+					(uint8_t)std::min(((uint32_t)blue + 0x7Fu) >> 8, 0xFFu));
 	}
-    void SetPixel8(uint32_t pixel_index, uint8_t red, uint8_t green, uint8_t blue,
-    				uint16_t const gammaTable[256])
-    {
-    	if (gammaTable)
-    	{
-	    	SetPixel16(pixel_index, gammaTable[red], gammaTable[green], gammaTable[blue]);
-	    }
-	    else
-	    {
-	    	SetPixel8(pixel_index, red, green, blue);
-	    }
-    }
     
 protected:
     LEDStrip(int pixelCount);
 
     const int pixelCount_;
-    uint32_t brightnessScale16_;
+    uint32_t redScale16_;
+    uint32_t greenScale16_;
+    uint32_t blueScale16_;
 /*
     RGBc *const values_;
 */
@@ -124,7 +119,9 @@ protected:
 // "pixelCount"     Number of LEDs.
 LEDStrip *CreateWS2801Strip(MultiSPI *spi, MultiSPI::Pin pin, int pixelCount);
 LEDStrip *CreateLPD6803Strip(MultiSPI *spi, MultiSPI::Pin pin, int pixelCount);
+LEDStrip *CreateLPD8806Strip(MultiSPI *spi, MultiSPI::Pin pin, int pixelCount);
 LEDStrip *CreateAPA102Strip(MultiSPI *spi, MultiSPI::Pin pin, int pixelCount);
+LEDStrip *CreateSK9822Strip(MultiSPI *spi, MultiSPI::Pin pin, int pixelCount);
 }
 
 #endif // SPIXELS_LED_STRIP_H
