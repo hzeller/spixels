@@ -81,7 +81,9 @@ static void *mmap_bcm_register(off_t register_offset) {
 }
 
 namespace spixels {
+
 namespace {
+
 class DMAMultiSPI : public MultiSPI {
 public:
     explicit DMAMultiSPI(MultiSPI::Pin clockPin);
@@ -199,7 +201,7 @@ void DMAMultiSPI::FinishRegistration() {
         const int n = remaining > kMaxOpsPerBlock ? kMaxOpsPerBlock : remaining;
         cb->info   = (DMA_CB_TI_SRC_INC | DMA_CB_TI_DEST_INC |
                       DMA_CB_TI_NO_WIDE_BURSTS | DMA_CB_TI_TDMODE);
-        cb->src    = (uint32_t)UncachedMemBlock_to_physical(&alloced_, start_gpio);
+        cb->src    = UncachedMemBlock_to_physical(&alloced_, start_gpio);
         cb->dst    = PHYSICAL_GPIO_BUS + GPIO_SET_OFFSET;
         cb->length = DMA_CB_TXFR_LEN_YLENGTH(n)
             | DMA_CB_TXFR_LEN_XLENGTH(sizeof(GPIOData));
@@ -218,14 +220,13 @@ void DMAMultiSPI::FinishRegistration() {
     dma_channel_ = (struct dma_channel_header*)(dmaBase + 0x100 * DMA_CHANNEL);
 }
 
-void DMAMultiSPI::SetBufferedByte(MultiSPI::Pin pin, size_t pos, uint8_t data)
-{
+void DMAMultiSPI::SetBufferedByte(MultiSPI::Pin pin, size_t pos, uint8_t data) {
     assert(pos < serial_byte_size_);
 
-	uint32_t		const pinBit = 1 << pin;
-	uint32_t		const pinNotBit = ~pinBit;
-    GPIOData*		buffer_pos = gpio_shadow_ + 2 * 8 * pos;
-    
+    uint32_t        const pinBit = 1 << pin;
+    uint32_t        const pinNotBit = ~pinBit;
+    GPIOData*       buffer_pos = gpio_shadow_ + 2 * 8 * pos;
+
     for (uint8_t bit = 0x80; bit != 0; bit >>= 1)
     {
         if (data & bit)
@@ -266,4 +267,5 @@ void DMAMultiSPI::SendBuffers() {
 MultiSPI *CreateDMAMultiSPI(MultiSPI::Pin clockPin) {
     return new DMAMultiSPI(clockPin);
 }
+
 }  // namespace spixels

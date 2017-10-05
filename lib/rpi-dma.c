@@ -47,10 +47,10 @@ struct UncachedMemBlock UncachedMemBlock_alloc(size_t size) {
 
     struct UncachedMemBlock result;
     result.size = size;
-    result.mem_handle = mem_alloc(mbox_fd, (unsigned int)size, PAGE_SIZE,
+    result.mem_handle = mem_alloc(mbox_fd, size, PAGE_SIZE,
                                   MEM_FLAG_L1_NONALLOCATING);
     result.bus_addr = mem_lock(mbox_fd, result.mem_handle);
-    result.mem = mapmem(BUS_TO_PHYS(result.bus_addr), (unsigned int)size);
+    result.mem = mapmem(BUS_TO_PHYS(result.bus_addr), size);
     assert(result.bus_addr);  // otherwise: couldn't allocate contiguous block.
     memset(result.mem, 0x00, size);
 
@@ -61,7 +61,7 @@ struct UncachedMemBlock UncachedMemBlock_alloc(size_t size) {
 void UncachedMemBlock_free(struct UncachedMemBlock *block) {
     if (block->mem == NULL) return;
     assert(mbox_fd >= 0);  // someone should've initialized that on allocate.
-    unmapmem(block->mem, (unsigned int)block->size);
+    unmapmem(block->mem, block->size);
     mem_unlock(mbox_fd, block->mem_handle);
     mem_free(mbox_fd, block->mem_handle);
     block->mem = NULL;
@@ -71,8 +71,9 @@ void UncachedMemBlock_free(struct UncachedMemBlock *block) {
 // Given a pointer to memory that is in the allocated block, return the
 // physical bus addresse needed by DMA operations.
 uintptr_t UncachedMemBlock_to_physical(const struct UncachedMemBlock *blk,
-				       void *p) {
-    uint32_t offset = (uint32_t)((uint8_t*)p - (uint8_t*)blk->mem);
+                       void *p) {
+    // offset WAS uint32_t, but this assumes the address buss is 32-bit
+    unsigned long offset = (uint8_t*)p - (uint8_t*)blk->mem;
     assert(offset < blk->size);   // pointer not within our block.
     return blk->bus_addr + offset;
 }

@@ -33,7 +33,7 @@ namespace spixels {
 MultiSPI::Pin MultiSPI::SPIPinForConnector(int connector) {
     switch (connector) {
     default :
-    	assert(false);
+        assert(false);
     case 1:  return SPI_P1;
     case 2:  return SPI_P2;
     case 3:  return SPI_P3;
@@ -55,6 +55,7 @@ MultiSPI::Pin MultiSPI::SPIPinForConnector(int connector) {
 }
 
 namespace {
+
 class DirectMultiSPI : public MultiSPI {
 public:
     explicit DirectMultiSPI(int speed_mhz, MultiSPI::Pin clockPin);
@@ -71,112 +72,96 @@ private:
     size_t size_;
     uint32_t *gpio_data_;
 };
+
 }  // end anonymous namespace
 
 DirectMultiSPI::DirectMultiSPI(int speed_mhz, MultiSPI::Pin clockPin)
-: clockPin_(clockPin)
-, write_repeat_(std::max(2, (int)roundf(30.0f / speed_mhz)))
-, size_(0)
-, gpio_data_(NULL)
-{
+: clockPin_(clockPin), write_repeat_(std::max(2, (int)roundf(30.0f / speed_mhz))), size_(0), gpio_data_(NULL) {
     bool success = gpio_.Init();
     assert(success);  // gpio couldn't be initialized
     success = gpio_.AddOutput(clockPin);
     assert(success);  // clock pin not valid
 }
 
-DirectMultiSPI::~DirectMultiSPI()
-{
-	if (gpio_data_)
-	{
-	    free(gpio_data_);
-	}
+DirectMultiSPI::~DirectMultiSPI() {
+    if (gpio_data_) {
+        free(gpio_data_);
+    }
 }
 
-bool DirectMultiSPI::RegisterDataGPIO(int gpio, size_t serial_byte_size)
-{
-    if (serial_byte_size > size_)
-    {
+bool DirectMultiSPI::RegisterDataGPIO(int gpio, size_t serial_byte_size) {
+    if (serial_byte_size > size_) {
         const size_t prev_size = size_ * 8 * sizeof(uint32_t);
         const size_t new_size = serial_byte_size * 8 * sizeof(uint32_t);
         size_ = serial_byte_size;
-		if (gpio_data_ == NULL)
-		{
+        if (gpio_data_ == NULL) {
             gpio_data_ = (uint32_t*)malloc(new_size);
         } else {
             gpio_data_ = (uint32_t*)realloc(gpio_data_, new_size);
         }
         bzero(gpio_data_ + prev_size, new_size-prev_size);
     }
-
     return gpio_.AddOutput(gpio);
 }
 
-void DirectMultiSPI::SetBufferedByte(MultiSPI::Pin pin, size_t pos, uint8_t data)
-{
-	assert(pos < size_);
-	if (pos < size_)
-	{
-		uint32_t		const pin_bit = 1 << pin;
-		uint32_t		const pin_not_bit = ~pin_bit;
-		uint32_t*		buffer_pos = gpio_data_ + 8 * pos;
+void DirectMultiSPI::SetBufferedByte(MultiSPI::Pin pin, size_t pos, uint8_t data) {
+    assert(pos < size_);
+    if (pos < size_) {
+        uint32_t        const pin_bit = 1 << pin;
+        uint32_t        const pin_not_bit = ~pin_bit;
+        uint32_t*       buffer_pos = gpio_data_ + 8 * pos;
 
 #if 1
-		for (uint8_t bit = 0x80; bit; bit >>= 1)
-		{
-			if (data & bit)
-			{   // set
-				*buffer_pos |= pin_bit;
-			}
-			else
-			{  // reset
-				*buffer_pos &= pin_not_bit;
-			}
-			buffer_pos++;
-		}
+        for (uint8_t bit = 0x80; bit; bit >>= 1) {
+            if (data & bit) {
+                // set
+                *buffer_pos |= pin_bit;
+            } else {
+                // reset
+                *buffer_pos &= pin_not_bit;
+            }
+            buffer_pos++;
+        }
 #else
-		// This unwound loop has no conditional branches, no broken pipeline!
-		// Yet it goes slower than the above loop on the Pi.  Go figure...
-		buffer_pos[7] = (buffer_pos[7] & pin_not_bit) | ((data & 1) << pin);
-		data >>= 1;
-		buffer_pos[6] = (buffer_pos[6] & pin_not_bit) | ((data & 1) << pin);
-		data >>= 1;
-		buffer_pos[5] = (buffer_pos[5] & pin_not_bit) | ((data & 1) << pin);
-		data >>= 1;
-		buffer_pos[4] = (buffer_pos[4] & pin_not_bit) | ((data & 1) << pin);
-		data >>= 1;
-		buffer_pos[3] = (buffer_pos[3] & pin_not_bit) | ((data & 1) << pin);
-		data >>= 1;
-		buffer_pos[2] = (buffer_pos[2] & pin_not_bit) | ((data & 1) << pin);
-		data >>= 1;
-		buffer_pos[1] = (buffer_pos[1] & pin_not_bit) | ((data & 1) << pin);
-		data >>= 1;
-		buffer_pos[0] = (buffer_pos[0] & pin_not_bit) | ((data & 1) << pin);
+        // This unwound loop has no conditional branches, no broken pipeline!
+        // Yet it goes slower than the above loop on the Pi.
+        // Maybe someday figure out why...
+        buffer_pos[7] = (buffer_pos[7] & pin_not_bit) | ((data & 1) << pin);
+        data >>= 1;
+        buffer_pos[6] = (buffer_pos[6] & pin_not_bit) | ((data & 1) << pin);
+        data >>= 1;
+        buffer_pos[5] = (buffer_pos[5] & pin_not_bit) | ((data & 1) << pin);
+        data >>= 1;
+        buffer_pos[4] = (buffer_pos[4] & pin_not_bit) | ((data & 1) << pin);
+        data >>= 1;
+        buffer_pos[3] = (buffer_pos[3] & pin_not_bit) | ((data & 1) << pin);
+        data >>= 1;
+        buffer_pos[2] = (buffer_pos[2] & pin_not_bit) | ((data & 1) << pin);
+        data >>= 1;
+        buffer_pos[1] = (buffer_pos[1] & pin_not_bit) | ((data & 1) << pin);
+        data >>= 1;
+        buffer_pos[0] = (buffer_pos[0] & pin_not_bit) | ((data & 1) << pin);
 #endif
-	}
+    }
 }
 
-void DirectMultiSPI::SendBuffers()
-{
-	uint32_t*		const end = gpio_data_ + 8 * size_;
-	
-	for (uint32_t *data = gpio_data_; data < end; ++data)
-	{
-	    uint32_t		d;
-	    
-	    d = *data;
-	    for (int i = 0; i < write_repeat_; ++i)
-	    {
-	    	gpio_.Write(d);
-	    }
-	    
-	    d |= 1 << clockPin_;   // pos clock edge.
-	    for (int i = 0; i < write_repeat_; ++i)
-	    {
-	    	gpio_.Write(d);
-	    }
-	}
-	gpio_.Write(0);  // Reset clock.
+void DirectMultiSPI::SendBuffers() {
+    uint32_t*       const end = gpio_data_ + 8 * size_;
+    
+    for (uint32_t *data = gpio_data_; data < end; ++data) {
+        uint32_t        d;
+        
+        d = *data;
+        for (int i = 0; i < write_repeat_; ++i) {
+            gpio_.Write(d);
+        }
+        
+        d |= 1 << clockPin_;   // pos clock edge.
+        for (int i = 0; i < write_repeat_; ++i) {
+            gpio_.Write(d);
+        }
+    }
+    gpio_.Write(0);  // Reset clock.
 }
 
 // Public interface

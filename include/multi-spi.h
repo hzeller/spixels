@@ -21,7 +21,9 @@
 #include <stdint.h>
 #include <stddef.h>
 
+
 namespace spixels {
+
 // MultiSPI outputs multiple SPI streams in parallel on different GPIOs.
 // The clock is on a single GPIO-pin. This way, we can transmit 25-ish
 // SPI streams in parallel on a Pi with 40 IO pins.
