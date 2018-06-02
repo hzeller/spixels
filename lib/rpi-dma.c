@@ -71,8 +71,9 @@ void UncachedMemBlock_free(struct UncachedMemBlock *block) {
 // Given a pointer to memory that is in the allocated block, return the
 // physical bus addresse needed by DMA operations.
 uintptr_t UncachedMemBlock_to_physical(const struct UncachedMemBlock *blk,
-				       void *p) {
-    uint32_t offset = (uint8_t*)p - (uint8_t*)blk->mem;
+                       void *p) {
+    // offset WAS uint32_t, but this assumes the address buss is 32-bit
+    unsigned long offset = (uint8_t*)p - (uint8_t*)blk->mem;
     assert(offset < blk->size);   // pointer not within our block.
     return blk->bus_addr + offset;
 }

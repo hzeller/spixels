@@ -21,88 +21,81 @@
 #define SPIXELS_LED_STRIP_H
 
 #include <stdint.h>
+#include <algorithm>
 
 #include "multi-spi.h"
 
 namespace spixels {
 
-// Red Green Blue color. A color represented by RGB values.
-struct RGBc {
-    RGBc(): r(0), g(0), b(0) {}
-
-    // Creating a color with the Red/Green/Blue components. If you are compiling
-    // with C++11, you can even do that in-line
-    // LEDStrip::SetPixel(0, {255, 255, 255});
-    RGBc(uint8_t red, uint8_t green, uint8_t blue) : r(red), g(green), b(blue) {}
-
-    // Setting a color from a single 24Bit 0xRRGGBB hex-value, e.g. 0xff00ff
-    RGBc(uint32_t hexcolor)
-        : r((hexcolor >> 16) & 0xFF),
-          g((hexcolor >>  8) & 0xFF),
-          b((hexcolor >>  0) & 0xFF) {}
-
-    uint8_t r;
-    uint8_t g;
-    uint8_t b;
-};
-
 // Simplest possible way for a LED strip.
 class LEDStrip {
 public:
-    virtual ~LEDStrip();
+    virtual ~LEDStrip() {};
 
-    // Return number of attached LEDs.
-    inline int count() const { return count_; }
-
-    // Set pixel color. Input it RGB, output is luminance corrected
-    // you don't have to apply pre-correction.
-    // This is typically the function to use.
-    void SetPixel(int pos, const RGBc& c);
-
-    // Same with explicitly spelled out r,g,b.
-    void SetPixel(int pos, uint8_t r, uint8_t g, uint8_t b) {
-        SetPixel(pos, RGBc(r, g, b));
+    inline int pixelCount() const {
+        return pixelCount_;
     }
 
-    // Set overall brightness for all pixels. Range of [0 .. 255].
-    // This scales the brightness so that it looks linear luminance corrected
-    // for the eye.
-    // This will be only having a somewhat pleasing result for LED strips with
-    // higher PWM resolution (such as APA102).
-    //
-    // Brightness change will take effect with next SendBuffers().
-    void SetBrightness(uint8_t brigthness);
-    inline uint8_t brightness() const { return brightness_; }
+    void SetBrightnessScale(float scale16) {
+        SetBrightnessScale(scale16, scale16, scale16);
+    }
+    // SetBrightnessScale() is virtual so that subclasses can prepare special data for scaling
+    virtual void SetBrightnessScale(float redScale, float greenScale, float blueScale) {
+        redScale_ = redScale;
+        greenScale_ = greenScale;
+        blueScale_ = blueScale;
 
-    // Set the raw, linear RGB value as provided by the LED strip, normalized
-    // to the range [0 .. 0xFFFF]. This is LED-Strip dependent.
-    //
-    // The range is always [0 .. 0xFFFF], but the implementation internally
-    // scales it to whatever the hardware can do (LPD6803 only uses the
-    // 5 Most significant bits, while APA102 can provide up to 12 bit
-    // resolution depending on the circumstances).
-    //
-    // Note, this is the _linear_ range provided by the RGB strip as
-    // opposed to the luminance corrected RGB value in SetPixel(). So only
-    // use if you need the direct values.
-    virtual void SetLinearValues(int pos,
-                                 uint16_t r, uint16_t g, uint16_t b) = 0;
+        redScale16_ = (uint32_t)(redScale * 0x10000 + 0.5f);
+        greenScale16_ = (uint32_t)(greenScale * 0x10000 + 0.5f);
+        blueScale16_ = (uint32_t)(blueScale * 0x10000 + 0.5f);
+    }
+    float redScale() const {
+        return redScale_;
+    }
+    float greenScale() const {
+        return greenScale_;
+    }
+    float blueScale() const {
+        return blueScale_;
+    }
+
+    // The following methods provide different ways of setting a pixel's value:
+    // The maximum value of a uint16_t component is 0xFFFF.  Most subclasses will just throw
+    // away the low byte.  APA102/SK9822 will make use of the extra bnits to set
+    // their "global brightness" values.
+    virtual void SetPixel8(uint32_t pixel_index, uint8_t red, uint8_t green, uint8_t blue) = 0;
+    virtual void SetPixel16(uint32_t pixel_index, uint16_t red, uint16_t green, uint16_t blue) {
+        // This default implementation will do for most subclasses, not for APA102/SK9822
+        SetPixel8(pixel_index,
+                    (uint8_t)std::min(((uint32_t)red + 0x7Fu) >> 8, 0xFFu),
+                    (uint8_t)std::min(((uint32_t)green + 0x7Fu) >> 8, 0xFFu),
+                    (uint8_t)std::min(((uint32_t)blue + 0x7Fu) >> 8, 0xFFu));
+    }
+
 protected:
-    LEDStrip(int count);
+    LEDStrip(int pixelCount);
 
-    const int count_;
-    RGBc *const values_;
-    uint8_t brightness_;
+    int         const pixelCount_;
+
+    float       redScale_;
+    float       greenScale_;
+    float       blueScale_;
+
+    uint32_t    redScale16_;
+    uint32_t    greenScale16_;
+    uint32_t    blueScale16_;
 };
 
 // Factories for various LED strips.
 // Parameters
 // "spi"       The MultiSPI instance
 // "connector" The connector on the breakout board, such as MultiSPI::SPI_P1
-// "count"     Number of LEDs.
-LEDStrip *CreateWS2801Strip(MultiSPI *spi, int connector, int count);
-LEDStrip *CreateLPD6803Strip(MultiSPI *spi, int connector, int count);
-LEDStrip *CreateAPA102Strip(MultiSPI *spi, int connector, int count);
+// "pixelCount"     Number of LEDs.
+LEDStrip *CreateWS2801Strip(MultiSPI *spi, MultiSPI::Pin pin, int pixelCount);
+LEDStrip *CreateLPD6803Strip(MultiSPI *spi, MultiSPI::Pin pin, int pixelCount);
+LEDStrip *CreateLPD8806Strip(MultiSPI *spi, MultiSPI::Pin pin, int pixelCount);
+LEDStrip *CreateAPA102Strip(MultiSPI *spi, MultiSPI::Pin pin, int pixelCount);
+LEDStrip *CreateSK9822Strip(MultiSPI *spi, MultiSPI::Pin pin, int pixelCount);
 }
 
 #endif // SPIXELS_LED_STRIP_H

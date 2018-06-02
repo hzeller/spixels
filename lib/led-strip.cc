@@ -22,177 +22,452 @@
 #include "multi-spi.h"
 #include "led-strip.h"
 
-typedef uint16_t CIEValue;
-
-// Do CIE1931 luminance correction and scale to maximum expected output bits.
-static CIEValue luminance_cie1931_internal(uint8_t c, uint8_t brightness) {
-    const float out_factor = 0xFFFF;
-    const float v = 100.0f * (brightness/255.0f) * (c/255.0f);
-    return out_factor * ((v <= 8) ? v / 902.3 : pow((v + 16) / 116.0, 3));
-}
-
-static CIEValue *CreateCIE1931LookupTable() {
-    CIEValue *result = new CIEValue[256 * 256];
-    for (int v = 0; v < 256; ++v) {      // Value
-        for (int b = 0; b < 256; ++b) {  // Brightness
-            result[b * 256 + v] = luminance_cie1931_internal(v, b);
-        }
-    }
-    return result;
-}
-
-// Return a CIE1931 corrected value from given desired lumninace value and
-// brightness.
-static CIEValue luminance_cie1931(uint8_t value, uint8_t bright) {
-    static const CIEValue *const luminance_lookup = CreateCIE1931LookupTable();
-    return luminance_lookup[bright * 256 + value];
-}
 
 namespace spixels {
-LEDStrip::LEDStrip(int count)
-    : count_(count), values_(new RGBc[count]), brightness_(255) {
+
+
+LEDStrip::LEDStrip(int pixelCount)
+: pixelCount_(pixelCount) {
+    redScale_ = 1.0f;
+    greenScale_ = 1.0f;
+    blueScale_ = 1.0f;
+
+    redScale16_ = 0x10000;
+    greenScale16_ = 0x10000;
+    blueScale16_ = 0x10000;
 }
 
-LEDStrip::~LEDStrip() { delete values_; }
-
-void LEDStrip::SetPixel(int pos, const RGBc& c) {
-    if (pos < 0 || pos >= count()) return;
-    values_[pos] = c;
-    SetLinearValues(pos,
-                    luminance_cie1931(c.r, brightness_),
-                    luminance_cie1931(c.g, brightness_),
-                    luminance_cie1931(c.b, brightness_));
-}
-
-void LEDStrip::SetBrightness(uint8_t new_brightness) {
-    if (new_brightness == brightness_) return;
-    brightness_ = new_brightness;
-    for (int i = 0; i < count_; ++i) {
-        SetPixel(i, values_[i]);  // Force recalculation.
-    }
-}
 
 namespace {
+
+
+/////////////////////////////////////////////////
+//#pragma mark - WS2801LedStrip:
+
+#define WS_start_frame_bytes    0
+#define WS_pixel_bytes          3
+#define WS_end_frame_bytes      0
+
 class WS2801LedStrip : public LEDStrip {
 public:
-    WS2801LedStrip(MultiSPI *spi, int gpio, int count)
-        : LEDStrip(count), spi_(spi), gpio_(gpio) {
-        spi_->RegisterDataGPIO(gpio, count * 3);
+    WS2801LedStrip(MultiSPI *spi, MultiSPI::Pin pin, int pixelCount)
+    : LEDStrip(pixelCount), spi_(spi), pin_(pin) {
+        const size_t frame_bytes = WS_start_frame_bytes + WS_pixel_bytes * pixelCount + WS_end_frame_bytes;
+
+        spi_->RegisterDataGPIO(pin, frame_bytes);
     }
 
-    virtual void SetLinearValues(int pos, uint16_t r, uint16_t g, uint16_t b) {
-        spi_->SetBufferedByte(gpio_, 3 * pos + 0, r >> 8);
-        spi_->SetBufferedByte(gpio_, 3 * pos + 1, g >> 8);
-        spi_->SetBufferedByte(gpio_, 3 * pos + 2, b >> 8);
+    virtual void SetPixel8(uint32_t pixel_index, uint8_t red, uint8_t green, uint8_t blue) {
+        if (pixel_index < (uint32_t)pixelCount_) {
+            red = (uint8_t)std::min(red * redScale16_ / 0x10000, (uint32_t)0xFF);
+            green = (uint8_t)std::min(green * greenScale16_ / 0x10000, (uint32_t)0xFF);
+            blue = (uint8_t)std::min(blue * blueScale16_ / 0x10000, (uint32_t)0xFF);
+
+            uint32_t        const offset = WS_start_frame_bytes + WS_pixel_bytes * pixel_index;
+
+            spi_->SetBufferedByte(pin_, offset + 0, red);
+            spi_->SetBufferedByte(pin_, offset + 1, green);
+            spi_->SetBufferedByte(pin_, offset + 2, blue);
+        }
     }
 
 private:
-    MultiSPI *const spi_;
-    const int gpio_;
+    MultiSPI*       const spi_;
+    MultiSPI::Pin   const pin_;
 };
+
+
+/////////////////////////////////////////////////
+//#pragma mark - LPD6803LedStrip:
+
+#define LPD6803_start_frame_bytes   4
+#define LPD6803_pixel_bytes         2
+#define LPD6803_end_frame_bytes     4
 
 class LPD6803LedStrip : public LEDStrip {
 public:
-    LPD6803LedStrip(MultiSPI *spi, int gpio, int count)
-        : LEDStrip(count), spi_(spi), gpio_(gpio) {
-        const size_t bytes_needed = 4 + 2 * count + 4;
-        spi_->RegisterDataGPIO(gpio, bytes_needed);
+    LPD6803LedStrip(MultiSPI *spi, MultiSPI::Pin pin, int pixelCount)
+    : LEDStrip(pixelCount), spi_(spi), pin_(pin) {
+        const size_t frame_bytes = LPD6803_start_frame_bytes + LPD6803_pixel_bytes * pixelCount + LPD6803_end_frame_bytes;
 
+        spi_->RegisterDataGPIO(pin, frame_bytes);
+
+        // These zeroings shouldn't be required since RegisterDataGPIO() clears all bytes
+        // But until it can be tested, we leave this in.
         // Four zero bytes as start-bytes for lpd6803
-        spi_->SetBufferedByte(gpio_, 0, 0x00);
-        spi_->SetBufferedByte(gpio_, 1, 0x00);
-        spi_->SetBufferedByte(gpio_, 2, 0x00);
-        spi_->SetBufferedByte(gpio_, 3, 0x00);
-        for (int pos = 0; pos < count; ++pos) {
-            SetPixel(pos, 0x000000);     // Initialize all top-bits.
+        spi_->SetBufferedByte(pin_, 0, 0x00);
+        spi_->SetBufferedByte(pin_, 1, 0x00);
+        spi_->SetBufferedByte(pin_, 2, 0x00);
+        spi_->SetBufferedByte(pin_, 3, 0x00);
+        for (int pixel_index = 0; pixel_index < pixelCount; ++pixel_index) {
+            SetPixel8(pixel_index, 0, 0, 0);     // Initialize all top-bits.
         }
     }
 
-    virtual void SetLinearValues(int pos, uint16_t r, uint16_t g, uint16_t b) {
-        uint16_t data = 0;
-        data |= (1<<15);  // start bit
-        data |= (r >> 11) << 10;
-        data |= (g >> 11) <<  5;
-        data |= (b >> 11) <<  0;
+    virtual void SetPixel8(uint32_t pixel_index, uint8_t red, uint8_t green, uint8_t blue) {
+        if (pixel_index < (uint32_t)pixelCount_) {
+            red = (uint8_t)std::min(red * redScale16_ / 0x10000, (uint32_t)0xFF);
+            green = (uint8_t)std::min(green * greenScale16_ / 0x10000, (uint32_t)0xFF);
+            blue = (uint8_t)std::min(blue * blueScale16_ / 0x10000, (uint32_t)0xFF);
 
-        spi_->SetBufferedByte(gpio_, 2 * pos + 4 + 0, data >> 8);
-        spi_->SetBufferedByte(gpio_, 2 * pos + 4 + 1, data & 0xFF);
+            uint16_t        data;
+
+            data = (1<<15);  // start bit
+            data |= (red >> 3) << 10;
+            data |= (green >> 3) <<  5;
+            data |= (blue >> 3) <<  0;
+
+            uint32_t        const offset = LPD6803_start_frame_bytes + LPD6803_pixel_bytes * pixel_index;
+
+            spi_->SetBufferedByte(pin_, offset + 0, data >> 8);
+            spi_->SetBufferedByte(pin_, offset + 1, data & 0xFF);
+        }
     }
 
 private:
-    MultiSPI *const spi_;
-    const int gpio_;
+    MultiSPI*       const spi_;
+    MultiSPI::Pin   const pin_;
 };
+
+
+/////////////////////////////////////////////////
+//#pragma mark - LPD8806LedStrip:
+
+#define LPD8806_start_frame_bytes   1
+#define LPD8806_pixel_bytes         3
+#define LPD8806_end_frame_bytes     0
+
+class LPD8806_LedStrip : public LEDStrip {
+public:
+    LPD8806_LedStrip(MultiSPI *spi, MultiSPI::Pin pin, int pixelCount)
+    : LEDStrip(pixelCount), spi_(spi), pin_(pin) {
+        const size_t frame_bytes = LPD8806_start_frame_bytes +
+                                    LPD8806_pixel_bytes * pixelCount +
+                                    LPD8806_end_frame_bytes;
+
+        spi_->RegisterDataGPIO(pin, frame_bytes);
+
+        // These zeroings shouldn't be required since RegisterDataGPIO() clears all bytes
+        // But until it can be tested, we leave this in.
+        // Four zero bytes as start-bytes for lpd6803
+        spi_->SetBufferedByte(pin_, 0, 0x00);
+        for (int pixel_index = 0; pixel_index < pixelCount; ++pixel_index) {
+            SetPixel8(pixel_index, 0, 0, 0);     // Initialize all top-bits.
+        }
+    }
+
+    virtual void SetPixel8(uint32_t pixel_index, uint8_t red, uint8_t green, uint8_t blue) {
+        if (pixel_index < (uint32_t)pixelCount_) {
+            uint32_t        const offset = LPD8806_start_frame_bytes + LPD8806_pixel_bytes * pixel_index;
+
+            red = (uint8_t)std::min(red * redScale16_ / 0x10000, (uint32_t)0xFF);
+            green = (uint8_t)std::min(green * greenScale16_ / 0x10000, (uint32_t)0xFF);
+            blue = (uint8_t)std::min(blue * blueScale16_ / 0x10000, (uint32_t)0xFF);
+
+            spi_->SetBufferedByte(pin_, offset + 0, (uint8_t)((blue >> 1) | 0x80));
+            spi_->SetBufferedByte(pin_, offset + 1, (uint8_t)((green >> 1) | 0x80));
+            spi_->SetBufferedByte(pin_, offset + 2, (uint8_t)((red >> 1) | 0x80));
+        }
+    }
+
+private:
+    MultiSPI*       const spi_;
+    MultiSPI::Pin   const pin_;
+};
+
+
+/////////////////////////////////////////////////
+//#pragma mark - APA102LedStrip:
+
+// The APA102 protocol has an extra byte for each pixel, 5 bits of which control its "global brightness".
+// This value is multipled by each component value to adjust the brightness of the entire pixel.
+// In the APA102, this is implemented by switching to 13-bit PWM.
+// Therefore, it is assumed that brightness dims linearly with "global brightness".
+// SetBrightnessScale() makes use of this parameter, choosing a 5-bit value to send for every pixel,
+// every frame.  It also stores 32-bit values that are multipled by each component for finer adjustment.
+// When SetPixel16() is called, the global brightness value for each pixel is calculated on the fly.
+
+#define APA_start_frame_bytes   4
+#define APA_pixel_bytes         4
+#define APA_latch_frame_bytes   4   // extra end-frame bytes for compatibility with SK9822 chips
 
 class APA102LedStrip : public LEDStrip {
 public:
-    APA102LedStrip(MultiSPI *spi, int gpio, int count)
-        : LEDStrip(count), spi_(spi), gpio_(gpio) {
-        const size_t startframe_size = 4;
-        const size_t endframe_size = (count+15) / 16;
-        const size_t bytes_needed = startframe_size + 4*count + endframe_size;
+    APA102LedStrip(MultiSPI *spi, MultiSPI::Pin pin, int pixelCount)
+    : LEDStrip(pixelCount), spi_(spi), pin_(pin) {
+        const size_t pixels_bytes = APA_pixel_bytes * pixelCount;
+        const size_t end_frame_bytes = APA_latch_frame_bytes + (pixelCount + 15) / 16;
+        const size_t frame_bytes = APA_start_frame_bytes + pixels_bytes + end_frame_bytes;
 
-        spi_->RegisterDataGPIO(gpio, bytes_needed);
+        spi_->RegisterDataGPIO(pin, frame_bytes);
 
-        // Four zero bytes as start-bytes
-        spi_->SetBufferedByte(gpio_, 0, 0x00);
-        spi_->SetBufferedByte(gpio_, 1, 0x00);
-        spi_->SetBufferedByte(gpio_, 2, 0x00);
-        spi_->SetBufferedByte(gpio_, 3, 0x00);
+        componentsRedScale16_ = 0x10000;
+        componentsGreenScale16_ = 0x10000;
+        componentsBlueScale16_ = 0x10000;
+        hardwareBrightnessByte_ = 0x1F;
 
-        // Make sure the start bits are properly set.
-        for (int i = 0; i < count; ++i) {
-            SetPixel(i, 0x000000);
-        }
+        if (!hardwareInverseTable8Created_) {
+            uint32_t        hardwareScale5;
 
-        // We need a couple of more bits clocked at the end.
-        for (size_t tail = 4 + 4*count; tail < bytes_needed; ++tail) {
-            spi_->SetBufferedByte(gpio_, tail, 0xff);
+            hardwareScale5 = 0;
+            hardwareInverseTable8_[0] = 0;
+            while (++hardwareScale5 < 32u) {
+                hardwareInverseTable8_[hardwareScale5] = (31u << 8) / hardwareScale5;
+            }
+            hardwareInverseTable8Created_ = true;
         }
     }
 
-    virtual void SetLinearValues(int pos, uint16_t r, uint16_t g, uint16_t b) {
-        const int base = 4 + 4 * pos;
-        r >>= 4; g >>= 4; b >>= 4;
+    virtual void SetBrightnessScale(float redScale, float greenScale, float blueScale) {
+        LEDStrip::SetBrightnessScale(redScale, greenScale, blueScale);
 
-        // If value is dim, use the APA global brightness adjustment for
-        // more resolution. We essentially get 4 bits at the bottom end.
-        const uint16_t bit_use = r | g | b;  // find highest bit used.
-        if (bit_use < 16) {
-            spi_->SetBufferedByte(gpio_, base + 0, 0xE0 | 0x01);
-        } else if (bit_use < 32) {
-            spi_->SetBufferedByte(gpio_, base + 0, 0xE0 | 0x03);
-            r >>= 1; g >>= 1; b >>= 1;
-        } else if (bit_use < 64) {
-            spi_->SetBufferedByte(gpio_, base + 0, 0xE0 | 0x07);
-            r >>= 2; g >>= 2; b >>= 2;
-        } else if (bit_use < 128) {
-            spi_->SetBufferedByte(gpio_, base + 0, 0xE0 | 0x0F);
-            r >>= 3; g >>= 3; b >>= 3;
+        uint32_t        const maxScale = std::max(std::max(redScale16_, greenScale16_), blueScale16_);
+
+        if (maxScale < 0x10000) {
+            uint32_t        hardwareScale5;
+
+            // maxScale is 0x10000 for no scaling.
+            // For APA102, we squeeze this range down to 0...31
+            // We disallow 0 since that would just result in blackness.
+            hardwareScale5 = (maxScale + 0x03FFu) >> 11;
+            hardwareScale5 = std::min(hardwareScale5, 31u);
+            hardwareScale5 = std::max(hardwareScale5, 1u);
+            hardwareBrightnessByte_ = (uint8_t)hardwareScale5 | 0xE0;
+
+            // componentsScale16_ scales down the compoent values directly.
+            // It provides more precision, in addition to the crude, 5-bit hardware brightness.
+            componentsRedScale16_ = redScale16_ * 31u / hardwareScale5;
+            componentsGreenScale16_ = greenScale16_ * 31u / hardwareScale5;
+            componentsBlueScale16_ = blueScale16_ * 31u / hardwareScale5;
         } else {
-            spi_->SetBufferedByte(gpio_, base + 0, 0xE0 | 0x1F);
-            r >>= 4; g >>= 4; b >>= 4;
+            // If scaling up or not scaling, don't use any hardware scaling.
+            // Just let componentsScale16_ do it.
+            hardwareBrightnessByte_ = 0xFF;
+            componentsRedScale16_ = redScale16_;
+            componentsGreenScale16_ = greenScale16_;
+            componentsBlueScale16_ = blueScale16_;
         }
 
-        spi_->SetBufferedByte(gpio_, base + 1, b);
-        spi_->SetBufferedByte(gpio_, base + 2, g);
-        spi_->SetBufferedByte(gpio_, base + 3, r);
+//      fprintf(stderr, "APA102LedStrip::SetBrightnessScale() - input=0x%04X, hardware=0x%02X, red=0x%04X, green=0x%04X, blue=0x%04X\n",
+//              maxScale, hardwareBrightnessByte_,
+//              componentsRedScale16_, componentsGreenScale16_, componentsBlueScale16_);
+    }
+
+    virtual void SetPixel8(uint32_t pixel_index, uint8_t red, uint8_t green, uint8_t blue) {
+        if (pixel_index < (uint32_t)pixelCount_) {
+            red = (uint8_t)std::min(red * componentsRedScale16_ / 0x10000u, 0xFFu);
+            green = (uint8_t)std::min(green * componentsGreenScale16_ / 0x10000u, 0xFFu);
+            blue = (uint8_t)std::min(blue * componentsBlueScale16_ / 0x10000u, 0xFFu);
+
+            int             const offset = APA_start_frame_bytes + APA_pixel_bytes * pixel_index;
+
+            spi_->SetBufferedByte(pin_, offset + 0, hardwareBrightnessByte_);
+            spi_->SetBufferedByte(pin_, offset + 1, blue);
+            spi_->SetBufferedByte(pin_, offset + 2, green);
+            spi_->SetBufferedByte(pin_, offset + 3, red);
+        }
+    }
+
+    virtual void SetPixel16(uint32_t pixel_index, uint16_t red, uint16_t green, uint16_t blue) {
+        if (pixel_index < (uint32_t)pixelCount_) {
+            red = (uint16_t)std::min((uint32_t)((uint64_t)red * redScale16_ / 0x10000), (uint32_t)0xFFFFu);
+            green = (uint16_t)std::min((uint32_t)((uint64_t)green * greenScale16_ / 0x10000), (uint32_t)0xFFFFu);
+            blue = (uint16_t)std::min((uint32_t)((uint64_t)blue * blueScale16_ / 0x10000), (uint32_t)0xFFFFu);
+
+            uint32_t        const maxComponent = std::max(std::max(red, green), blue);
+            uint32_t        const high5Bits = (maxComponent + 1 + 0x03FF) >> 11;
+            uint32_t        const hardwareScale5 = std::max(std::min(high5Bits, 31u), 1u);
+            uint32_t        const hardwareInverse8 = hardwareInverseTable8_[hardwareScale5];
+
+            red = (uint16_t)std::min(red * hardwareInverse8 / 0x10000, 0xFFu);
+            green = (uint16_t)std::min(green * hardwareInverse8 / 0x10000, 0xFFu);
+            blue = (uint16_t)std::min(blue * hardwareInverse8 / 0x10000, 0xFFu);
+
+            int             const offset = APA_start_frame_bytes + APA_pixel_bytes * pixel_index;
+
+            spi_->SetBufferedByte(pin_, offset + 0, (uint8_t)(0xE0 | hardwareScale5));
+            spi_->SetBufferedByte(pin_, offset + 1, (uint8_t)blue);
+            spi_->SetBufferedByte(pin_, offset + 2, (uint8_t)green);
+            spi_->SetBufferedByte(pin_, offset + 3, (uint8_t)red);
+        }
     }
 
 private:
-    MultiSPI *const spi_;
-    const int gpio_;
+    MultiSPI*       const spi_;
+    MultiSPI::Pin   const pin_;
+    uint32_t        componentsRedScale16_;              // scales component values before sending to spi_
+    uint32_t        componentsGreenScale16_;            // scales component values before sending to spi_
+    uint32_t        componentsBlueScale16_;             // scales component values before sending to spi_
+    uint8_t         hardwareBrightnessByte_;            // byte sent to APA102 when SetPixel8() used
+
+static bool         hardwareInverseTable8Created_;
+static uint32_t     hardwareInverseTable8_[32];         // used by SetPixel16() to quickly divide
 };
+
+bool            APA102LedStrip::hardwareInverseTable8Created_ = false;
+uint32_t        APA102LedStrip::hardwareInverseTable8_[32];
+
+
+/////////////////////////////////////////////////
+//#pragma mark - SK9822LedStrip:
+
+// APA102 and SK9822 strips have the same protocol, but they implement
+// "global brightness" differently.
+// APA102 uses 13-bit PWM to implement global brightness.  This is assumed
+// to be linear.
+// SK9822 uses a variable current driver, which is inherently nonlinear.
+// When pixels are dimmed with global brightness, they appear brighter than they
+// do in an APA102 chip.  Also, pixels appear to get more blue/green as they
+// are dimmed this way.
+// Therefore, SK9822LedStrip{} has separate "hardware inverse" tables for red, green, and blue.
+// They are created slightly differently, to adjust color as lower and lower global brightness
+// values are used.  When no hardware dimmings is used, they don't scale components at all.
+
+class SK9822LedStrip : public LEDStrip {
+public:
+    SK9822LedStrip(MultiSPI *spi, MultiSPI::Pin pin, int pixelCount)
+    : LEDStrip(pixelCount), spi_(spi), pin_(pin) {
+        const size_t pixels_bytes = APA_pixel_bytes * pixelCount;
+        const size_t end_frame_bytes = APA_latch_frame_bytes + (pixelCount + 15) / 16;
+        const size_t frame_bytes = APA_start_frame_bytes + pixels_bytes + end_frame_bytes;
+
+        spi_->RegisterDataGPIO(pin, frame_bytes);
+
+        componentsRedScale16_ = 0x10000;
+        componentsGreenScale16_ = 0x10000;
+        componentsBlueScale16_ = 0x10000;
+        hardwareBrightnessByte_ = 0x1F;
+
+        if (!hardwareInverseTablesCreated_) {
+            uint32_t        hardwareScale5;
+
+            hardwareScale5 = 0;
+            hardwareRedInverseTable8_[0] = 0;
+            hardwareGreenInverseTable8_[0] = 0;
+            hardwareBlueInverseTable8_[0] = 0;
+            while (++hardwareScale5 < 32u) {
+                hardwareRedInverseTable8_[hardwareScale5] = (31u * 0xF0) / hardwareScale5 + (0x100 - 0xF0);
+                hardwareGreenInverseTable8_[hardwareScale5] = (31u * 0x80) / hardwareScale5 + (0x100 - 0x80);
+                hardwareBlueInverseTable8_[hardwareScale5] = (31u * 0x80) / hardwareScale5 + (0x100 - 0x80);
+            }
+            hardwareInverseTablesCreated_ = true;
+        }
+    }
+
+    virtual void SetBrightnessScale(float redScale, float greenScale, float blueScale) {
+        LEDStrip::SetBrightnessScale(redScale, greenScale, blueScale);
+
+        uint32_t        const maxScale = std::max(std::max(redScale16_, greenScale16_), blueScale16_);
+
+        if (maxScale < 0x10000) {
+            uint32_t        hardwareScale5;
+
+            // maxScale is 0x10000 for no scaling.
+            // For SK9822, we squeeze this range down to 0...31
+            // We disallow 0 since that would just result in blackness.
+            hardwareScale5 = (maxScale + 0x03FFu) >> 11;
+            hardwareScale5 = std::min(hardwareScale5, 31u);
+            hardwareScale5 = std::max(hardwareScale5, 1u);
+            hardwareBrightnessByte_ = (uint8_t)hardwareScale5 | 0xE0;
+
+            // componentsScale16_ scales down the compoent values directly.
+            // It provides more precision, in addition to the crude, 5-bit hardware brightness.
+            componentsRedScale16_ = redScale16_ * hardwareRedInverseTable8_[hardwareScale5] / 0x100;
+            componentsGreenScale16_ = greenScale16_ * hardwareGreenInverseTable8_[hardwareScale5] / 0x100;
+            componentsBlueScale16_ = blueScale16_ * hardwareBlueInverseTable8_[hardwareScale5] / 0x100;
+        } else {
+            // If scaling up or not scaling, don't use any hardware scaling.
+            // Just let componentsScale16_ do it.
+            hardwareBrightnessByte_ = 0xFF;
+            componentsRedScale16_ = redScale16_;
+            componentsGreenScale16_ = greenScale16_;
+            componentsBlueScale16_ = blueScale16_;
+        }
+
+//      fprintf(stderr, "SK9822LedStrip::SetBrightnessScale() - input=0x%04X, hardware=0x%02X, red=0x%04X, green=0x%04X, blue=0x%04X\n",
+//              maxScale, hardwareBrightnessByte_ & 0x1F,
+//              componentsRedScale16_, componentsGreenScale16_, componentsBlueScale16_);
+    }
+
+    virtual void SetPixel8(uint32_t pixel_index, uint8_t red, uint8_t green, uint8_t blue) {
+        if (pixel_index < (uint32_t)pixelCount_) {
+            red = (uint8_t)std::min(red * componentsRedScale16_ / 0x10000u, 0xFFu);
+            green = (uint8_t)std::min(green * componentsGreenScale16_ / 0x10000u, 0xFFu);
+            blue = (uint8_t)std::min(blue * componentsBlueScale16_ / 0x10000u, 0xFFu);
+
+            int             const offset = APA_start_frame_bytes + APA_pixel_bytes * pixel_index;
+
+            spi_->SetBufferedByte(pin_, offset + 0, hardwareBrightnessByte_);
+            spi_->SetBufferedByte(pin_, offset + 1, blue);
+            spi_->SetBufferedByte(pin_, offset + 2, green);
+            spi_->SetBufferedByte(pin_, offset + 3, red);
+        }
+    }
+
+    virtual void SetPixel16(uint32_t pixel_index, uint16_t red, uint16_t green, uint16_t blue) {
+        if (pixel_index < (uint32_t)pixelCount_) {
+            red = (uint16_t)std::min((uint32_t)((uint64_t)red * redScale16_ / 0x10000), (uint32_t)0xFFFFu);
+            green = (uint16_t)std::min((uint32_t)((uint64_t)green * greenScale16_ / 0x10000), (uint32_t)0xFFFFu);
+            blue = (uint16_t)std::min((uint32_t)((uint64_t)blue * blueScale16_ / 0x10000), (uint32_t)0xFFFFu);
+
+            uint32_t        const maxComponent = std::max(std::max(red, green), blue);
+            uint32_t        const high5Bits = (maxComponent + 1 + 0x03FF) >> 11;
+            uint32_t        const hardwareScale5 = std::max(std::min(high5Bits, 31u), 1u);
+
+            red = (uint16_t)std::min(red * hardwareRedInverseTable8_[hardwareScale5] / 0x10000, 0xFFu);
+            green = (uint16_t)std::min(green * hardwareGreenInverseTable8_[hardwareScale5] / 0x10000, 0xFFu);
+            blue = (uint16_t)std::min(blue * hardwareBlueInverseTable8_[hardwareScale5] / 0x10000, 0xFFu);
+
+            int             const offset = APA_start_frame_bytes + APA_pixel_bytes * pixel_index;
+
+            spi_->SetBufferedByte(pin_, offset + 0, (uint8_t)(0xE0 | hardwareScale5));
+            spi_->SetBufferedByte(pin_, offset + 1, (uint8_t)blue);
+            spi_->SetBufferedByte(pin_, offset + 2, (uint8_t)green);
+            spi_->SetBufferedByte(pin_, offset + 3, (uint8_t)red);
+        }
+    }
+
+protected:
+    MultiSPI*       const spi_;
+    MultiSPI::Pin   const pin_;
+
+private:
+    uint32_t        componentsRedScale16_;              // scales component values before sending to spi_
+    uint32_t        componentsGreenScale16_;            // scales component values before sending to spi_
+    uint32_t        componentsBlueScale16_;             // scales component values before sending to spi_
+    uint8_t         hardwareBrightnessByte_;            // byte sent to APA102 when SetPixel8() used
+
+static bool         hardwareInverseTablesCreated_;
+static uint32_t     hardwareRedInverseTable8_[32];      // used by SetPixel16() to quickly divide
+static uint32_t     hardwareGreenInverseTable8_[32];    // used by SetPixel16() to quickly divide
+static uint32_t     hardwareBlueInverseTable8_[32];     // used by SetPixel16() to quickly divide
+};
+
+bool            SK9822LedStrip::hardwareInverseTablesCreated_ = false;
+uint32_t        SK9822LedStrip::hardwareRedInverseTable8_[32];
+uint32_t        SK9822LedStrip::hardwareGreenInverseTable8_[32];
+uint32_t        SK9822LedStrip::hardwareBlueInverseTable8_[32];
+
+
 }  // anonymous namespace
 
+
 // Public interface
-LEDStrip *CreateWS2801Strip(MultiSPI *spi, int connector, int count) {
-    return new WS2801LedStrip(spi, connector, count);
+LEDStrip *CreateWS2801Strip(MultiSPI *spi, MultiSPI::Pin pin, int pixelCount) {
+    return new WS2801LedStrip(spi, pin, pixelCount);
 }
-LEDStrip *CreateLPD6803Strip(MultiSPI *spi, int connector, int count) {
-    return new LPD6803LedStrip(spi, connector, count);
+LEDStrip *CreateLPD6803Strip(MultiSPI *spi, MultiSPI::Pin pin, int pixelCount) {
+    return new LPD6803LedStrip(spi, pin, pixelCount);
 }
-LEDStrip *CreateAPA102Strip(MultiSPI *spi, int connector, int count) {
-    return new APA102LedStrip(spi, connector, count);
+LEDStrip *CreateLPD8806Strip(MultiSPI *spi, MultiSPI::Pin pin, int pixelCount) {
+    return new LPD8806_LedStrip(spi, pin, pixelCount);
 }
+LEDStrip *CreateAPA102Strip(MultiSPI *spi, MultiSPI::Pin pin, int pixelCount) {
+    return new APA102LedStrip(spi, pin, pixelCount);
+}
+LEDStrip *CreateSK9822Strip(MultiSPI *spi, MultiSPI::Pin pin, int pixelCount) {
+    return new SK9822LedStrip(spi, pin, pixelCount);
+}
+
+
 }  // spixels namespace

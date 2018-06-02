@@ -28,7 +28,9 @@ Original:
 https://github.com/raspberrypi/userland/blob/master/host_applications/linux/apps/hello_pi/hello_fft/mailbox.h
 */
 
-#include <linux/ioctl.h>
+#ifndef __APPLE__
+    #include <linux/ioctl.h>
+#endif
 
 #define MAJOR_NUM 100
 #define IOCTL_MBOX_PROPERTY _IOWR(MAJOR_NUM, 0, char *)
