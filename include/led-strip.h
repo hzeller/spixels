@@ -102,6 +102,7 @@ protected:
 // "count"     Number of LEDs.
 LEDStrip *CreateWS2801Strip(MultiSPI *spi, int connector, int count);
 LEDStrip *CreateLPD6803Strip(MultiSPI *spi, int connector, int count);
+LEDStrip *CreateLPD8806Strip(MultiSPI *spi, int connector, int count);
 LEDStrip *CreateAPA102Strip(MultiSPI *spi, int connector, int count);
 }
 

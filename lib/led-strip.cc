@@ -124,6 +124,36 @@ private:
     const int gpio_;
 };
 
+class LPD8806LedStrip : public LEDStrip {
+public:
+    LPD8806LedStrip(MultiSPI *spi, int gpio, int count)
+        : LEDStrip(count), spi_(spi), gpio_(gpio) {
+        const size_t data_bytes = 3 * count;
+        const size_t latch_bytes = (count+31)/32;
+        const size_t bytes_needed = data_bytes + latch_bytes;
+        spi_->RegisterDataGPIO(gpio, bytes_needed);
+
+	for (size_t i = 0; i < bytes_needed; ++i) {
+            spi_->SetBufferedByte(gpio_, i, 0x00);
+        }
+
+        for (int pos = 0; pos < count; ++pos) {
+            SetPixel(pos, 0x000000);     // Initialize all top-bits.
+        }
+    }
+
+    virtual void SetLinearValues(int pos, uint16_t r, uint16_t g, uint16_t b) {
+        spi_->SetBufferedByte(gpio_, 3 * pos + 0, (b >> 9) | 0x80);
+        spi_->SetBufferedByte(gpio_, 3 * pos + 1, (r >> 9) | 0x80);
+        spi_->SetBufferedByte(gpio_, 3 * pos + 2, (g >> 9) | 0x80);
+    }
+
+private:
+    MultiSPI *const spi_;
+    const int gpio_;
+};
+
+
 class APA102LedStrip : public LEDStrip {
 public:
     APA102LedStrip(MultiSPI *spi, int gpio, int count)
@@ -191,6 +221,9 @@ LEDStrip *CreateWS2801Strip(MultiSPI *spi, int connector, int count) {
 }
 LEDStrip *CreateLPD6803Strip(MultiSPI *spi, int connector, int count) {
     return new LPD6803LedStrip(spi, connector, count);
+}
+LEDStrip *CreateLPD8806Strip(MultiSPI *spi, int connector, int count) {
+    return new LPD8806LedStrip(spi, connector, count);
 }
 LEDStrip *CreateAPA102Strip(MultiSPI *spi, int connector, int count) {
     return new APA102LedStrip(spi, connector, count);
