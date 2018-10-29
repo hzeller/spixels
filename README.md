@@ -26,8 +26,8 @@ You now have a subdirectory `spixels/` in your project. See
 the [Makefile](./examples/Makefile) in the examples/ directory as a
 template how to use it with your project.
 
-You find the board in the [hardware/](./hardware) directory (including OshPark
-link).
+You find the board in the [hardware/](./hardware/pi-adapter-16) directory
+(including Gerbers and OshPark link).
 
 The adpater is compatible with any Raspberry Pi with 40 GPIO pins, such as the
 Pi 1 B+, Pi 2 or Pi 3.
