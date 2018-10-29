@@ -1,4 +1,4 @@
-update=Sat 13 Jun 2015 10:20:45 AM PDT
+update=Sun 28 Oct 2018 06:40:55 PM PDT
 version=1
 last_client=kicad
 [cvpcb]
@@ -31,4 +31,3 @@ ModuleOutlineThickness=0.15
 [eeschema]
 version=1
 LibDir=
-[eeschema/libraries]

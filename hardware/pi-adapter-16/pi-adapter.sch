@@ -1,9 +1,6 @@
-EESchema Schematic File Version 2
-LIBS:power
-LIBS:conn
-LIBS:74xx
+EESchema Schematic File Version 4
 LIBS:pi-adapter-cache
-EELAYER 26 0
+EELAYER 29 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
@@ -18,7 +15,7 @@ Comment3 ""
 Comment4 ""
 $EndDescr
 $Comp
-L 74HC245 U1
+L pi-adapter-rescue:74HC245 U1
 U 1 1 54ECAC85
 P 4550 1750
 F 0 "U1" H 4650 2325 60  0000 L BNN
@@ -29,7 +26,7 @@ F 3 "" H 4550 1750 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L 74HC245 U2
+L pi-adapter-rescue:74HC245 U2
 U 1 1 54ECB18C
 P 4550 3450
 F 0 "U2" H 4550 4238 60  0000 C CNN
@@ -40,7 +37,7 @@ F 3 "" H 4550 3450 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L 74HC245 U3
+L pi-adapter-rescue:74HC245 U3
 U 1 1 54ECB1EA
 P 4550 5150
 F 0 "U3" H 4650 5725 60  0000 L BNN
@@ -58,7 +55,7 @@ Wire Wire Line
 	2450 2800 2400 2800
 Connection ~ 2450 2700
 $Comp
-L GND #PWR01
+L pi-adapter-rescue:GND #PWR01
 U 1 1 54ECB417
 P 2500 3600
 F 0 "#PWR01" H 2500 3600 30  0001 C CNN
@@ -71,7 +68,7 @@ $EndComp
 Wire Wire Line
 	2400 3600 2500 3600
 $Comp
-L GND #PWR02
+L pi-adapter-rescue:GND #PWR02
 U 1 1 54ECB4A1
 P 2500 2900
 F 0 "#PWR02" H 2500 2900 30  0001 C CNN
@@ -84,7 +81,7 @@ $EndComp
 Wire Wire Line
 	2400 2900 2500 2900
 $Comp
-L GND #PWR03
+L pi-adapter-rescue:GND #PWR03
 U 1 1 54ECB5FE
 P 1800 4600
 F 0 "#PWR03" H 1800 4600 30  0001 C CNN
@@ -99,7 +96,7 @@ Wire Wire Line
 Wire Wire Line
 	1850 4600 1900 4600
 $Comp
-L GND #PWR04
+L pi-adapter-rescue:GND #PWR04
 U 1 1 54ECB73E
 P 2500 4300
 F 0 "#PWR04" H 2500 4300 30  0001 C CNN
@@ -112,7 +109,7 @@ $EndComp
 Wire Wire Line
 	2400 4300 2500 4300
 $Comp
-L GND #PWR05
+L pi-adapter-rescue:GND #PWR05
 U 1 1 54ECB7BC
 P 1400 4150
 F 0 "#PWR05" H 1400 4150 30  0001 C CNN
@@ -151,7 +148,7 @@ D11
 Text GLabel 1900 3400 0    51   Output ~ 0
 D5
 $Comp
-L C C1
+L pi-adapter-rescue:C C1
 U 1 1 54ECBE4F
 P 1600 5600
 F 0 "C1" H 1600 5700 40  0000 L CNN
@@ -162,7 +159,7 @@ F 3 "" H 1600 5600 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L C C2
+L pi-adapter-rescue:C C2
 U 1 1 54ECBEE4
 P 1900 5600
 F 0 "C2" H 1900 5700 40  0000 L CNN
@@ -173,7 +170,7 @@ F 3 "" H 1900 5600 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L C C3
+L pi-adapter-rescue:C C3
 U 1 1 54ECBF0A
 P 2200 5600
 F 0 "C3" H 2200 5700 40  0000 L CNN
@@ -184,7 +181,7 @@ F 3 "" H 2200 5600 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR06
+L pi-adapter-rescue:GND #PWR06
 U 1 1 54ECBF56
 P 1900 5850
 F 0 "#PWR06" H 1900 5850 30  0001 C CNN
@@ -217,7 +214,7 @@ Wire Wire Line
 	2200 5750 2450 5750
 Connection ~ 1900 5750
 $Comp
-L VCC #PWR07
+L pi-adapter-rescue:VCC #PWR07
 U 1 1 54ECD0C1
 P 1900 5350
 F 0 "#PWR07" H 1900 5450 30  0001 C CNN
@@ -228,7 +225,7 @@ F 3 "" H 1900 5350 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR08
+L pi-adapter-rescue:GND #PWR08
 U 1 1 54ECF31C
 P 3850 2300
 F 0 "#PWR08" H 3850 2300 30  0001 C CNN
@@ -241,7 +238,7 @@ $EndComp
 Wire Wire Line
 	3850 2250 3850 2300
 $Comp
-L GND #PWR09
+L pi-adapter-rescue:GND #PWR09
 U 1 1 54ECF3AB
 P 3850 4000
 F 0 "#PWR09" H 3850 4000 30  0001 C CNN
@@ -252,7 +249,7 @@ F 3 "" H 3850 4000 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR010
+L pi-adapter-rescue:GND #PWR010
 U 1 1 54ECF608
 P 3850 5700
 F 0 "#PWR010" H 3850 5700 30  0001 C CNN
@@ -269,7 +266,7 @@ Wire Wire Line
 Text GLabel 3850 1250 0    51   Input ~ 0
 clock
 $Comp
-L VCC #PWR011
+L pi-adapter-rescue:VCC #PWR011
 U 1 1 54ED6227
 P 3600 2150
 F 0 "#PWR011" H 3600 2250 30  0001 C CNN
@@ -282,7 +279,7 @@ $EndComp
 Wire Wire Line
 	3850 2150 3600 2150
 $Comp
-L VCC #PWR012
+L pi-adapter-rescue:VCC #PWR012
 U 1 1 54ED629A
 P 3600 3850
 F 0 "#PWR012" H 3600 3950 30  0001 C CNN
@@ -295,7 +292,7 @@ $EndComp
 Wire Wire Line
 	3600 3850 3850 3850
 $Comp
-L VCC #PWR013
+L pi-adapter-rescue:VCC #PWR013
 U 1 1 54ED670D
 P 3650 5550
 F 0 "#PWR013" H 3650 5650 30  0001 C CNN
@@ -314,7 +311,7 @@ D4
 Text GLabel 2400 3200 2    51   Output ~ 0
 D1
 $Comp
-L C C4
+L pi-adapter-rescue:C C4
 U 1 1 54F3B6F5
 P 2450 5600
 F 0 "C4" H 2450 5700 40  0000 L CNN
@@ -327,7 +324,7 @@ $EndComp
 Connection ~ 2200 5450
 Connection ~ 2200 5750
 $Comp
-L 74HC245 U4
+L pi-adapter-rescue:74HC245 U4
 U 1 1 54F3F4A2
 P 4550 6950
 F 0 "U4" H 4650 7525 60  0000 L BNN
@@ -338,7 +335,7 @@ F 3 "" H 4550 6950 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR014
+L pi-adapter-rescue:GND #PWR014
 U 1 1 54F3F4AD
 P 3850 7500
 F 0 "#PWR014" H 3850 7500 30  0001 C CNN
@@ -353,7 +350,7 @@ Wire Wire Line
 Text GLabel 3850 6450 0    51   Input ~ 0
 clock
 $Comp
-L VCC #PWR015
+L pi-adapter-rescue:VCC #PWR015
 U 1 1 54F3F4B9
 P 3650 7350
 F 0 "#PWR015" H 3650 7450 30  0001 C CNN
@@ -369,7 +366,7 @@ NoConn ~ 1900 4000
 NoConn ~ 2400 4000
 NoConn ~ 1900 3500
 $Comp
-L PWR_FLAG #FLG016
+L pi-adapter-rescue:PWR_FLAG #FLG016
 U 1 1 557B23A7
 P 1850 4700
 F 0 "#FLG016" H 1850 4795 50  0001 C CNN
@@ -383,7 +380,7 @@ Wire Wire Line
 	1850 4600 1850 4700
 Connection ~ 1850 4600
 $Comp
-L GND #PWR017
+L pi-adapter-rescue:GND #PWR017
 U 1 1 562B120F
 P 2700 1800
 F 0 "#PWR017" H 2700 1800 30  0001 C CNN
@@ -394,7 +391,7 @@ F 3 "" H 2700 1800 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L VCC #PWR018
+L pi-adapter-rescue:VCC #PWR018
 U 1 1 562B12CC
 P 1950 1400
 F 0 "#PWR018" H 1950 1500 30  0001 C CNN
@@ -407,7 +404,7 @@ $EndComp
 Text Notes 1150 1750 0    60   ~ 0
 Pi Power 5V
 $Comp
-L C_Small C6
+L pi-adapter-rescue:C_Small C6
 U 1 1 562B2FF4
 P 1300 5600
 F 0 "C6" H 1310 5670 50  0000 L CNN
@@ -418,7 +415,7 @@ F 3 "" H 1300 5600 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L CONN_01X01 P30
+L pi-adapter-rescue:CONN_01X01 P30
 U 1 1 562B3873
 P 1700 1600
 F 0 "P30" H 1800 1600 50  0000 C CNN
@@ -429,7 +426,7 @@ F 3 "" H 1700 1600 60  0000 C CNN
 	-1   0    0    1   
 $EndComp
 $Comp
-L CONN_01X01 P31
+L pi-adapter-rescue:CONN_01X01 P31
 U 1 1 562B38C3
 P 1700 1800
 F 0 "P31" H 1800 1800 50  0000 C CNN
@@ -468,7 +465,7 @@ clock
 Text GLabel 3850 7150 0    51   Input ~ 0
 clock
 $Comp
-L CONN_01X04 P2
+L pi-adapter-rescue:CONN_01X04 P2
 U 1 1 56C16676
 P 5550 1000
 F 0 "P2" V 5515 756 50  0000 R CNN
@@ -479,7 +476,7 @@ F 3 "" H 5550 1000 50  0000 C CNN
 	0    -1   -1   0   
 $EndComp
 $Comp
-L CONN_01X04 P1
+L pi-adapter-rescue:CONN_01X04 P1
 U 1 1 56C1694E
 P 5550 2300
 F 0 "P1" V 5422 2056 50  0000 R CNN
@@ -490,7 +487,7 @@ F 3 "" H 5550 2300 50  0000 C CNN
 	0    -1   1    0   
 $EndComp
 $Comp
-L CONN_01X04 P10
+L pi-adapter-rescue:CONN_01X04 P10
 U 1 1 56C16C70
 P 6050 1150
 F 0 "P10" V 6015 906 50  0000 R CNN
@@ -511,7 +508,7 @@ Wire Wire Line
 Wire Wire Line
 	5250 1850 5600 1850
 $Comp
-L CONN_01X04 P9
+L pi-adapter-rescue:CONN_01X04 P9
 U 1 1 56C17042
 P 6050 2050
 F 0 "P9" V 5922 1806 50  0000 R CNN
@@ -540,7 +537,7 @@ Wire Wire Line
 Wire Wire Line
 	5900 1700 5900 1850
 $Comp
-L GND #PWR019
+L pi-adapter-rescue:GND #PWR019
 U 1 1 56C176D3
 P 6400 1750
 F 0 "#PWR019" H 6400 1750 30  0001 C CNN
@@ -551,7 +548,7 @@ F 3 "" H 6400 1750 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L CONN_02X20 P20
+L pi-adapter-rescue:CONN_02X20 P20
 U 1 1 54ECB2B7
 P 2150 3650
 F 0 "P20" H 2150 4700 50  0000 C CNN
@@ -562,7 +559,7 @@ F 3 "" H 2150 2700 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L CONN_01X03 P23
+L pi-adapter-rescue:CONN_01X03 P23
 U 1 1 56C196A7
 P 3000 3100
 F 0 "P23" H 3077 3138 50  0000 L CNN
@@ -573,7 +570,7 @@ F 3 "" H 3000 3100 50  0000 C CNN
 	1    0    0    1   
 $EndComp
 $Comp
-L GND #PWR020
+L pi-adapter-rescue:GND #PWR020
 U 1 1 56C198BA
 P 2800 3300
 F 0 "#PWR020" H 2800 3300 30  0001 C CNN
@@ -584,7 +581,7 @@ F 3 "" H 2800 3300 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L CONN_01X03 P21
+L pi-adapter-rescue:CONN_01X03 P21
 U 1 1 56C19AA9
 P 1200 2900
 F 0 "P21" H 1119 2568 50  0000 C CNN
@@ -633,7 +630,7 @@ D15
 Text GLabel 3850 6550 0    51   Input ~ 0
 D16
 $Comp
-L FUSE F1
+L pi-adapter-rescue:FUSE F1
 U 1 1 56C21A23
 P 2250 1600
 F 0 "F1" H 2250 1841 50  0000 C CNN
@@ -649,7 +646,7 @@ Wire Wire Line
 	1950 1600 2000 1600
 Connection ~ 1950 1600
 $Comp
-L VCC #PWR022
+L pi-adapter-rescue:VCC #PWR022
 U 1 1 56C22E4F
 P 2450 2650
 F 0 "#PWR022" H 2450 2750 30  0001 C CNN
@@ -714,7 +711,7 @@ Wire Wire Line
 Text Notes 5150 900  0    60   ~ 0
 GND CLK DO +5V\n
 $Comp
-L CONN_01X04 P4
+L pi-adapter-rescue:CONN_01X04 P4
 U 1 1 56C22C41
 P 5550 2700
 F 0 "P4" V 5515 2456 50  0000 R CNN
@@ -725,7 +722,7 @@ F 3 "" H 5550 2700 50  0000 C CNN
 	0    -1   -1   0   
 $EndComp
 $Comp
-L CONN_01X04 P3
+L pi-adapter-rescue:CONN_01X04 P3
 U 1 1 56C22C47
 P 5550 4000
 F 0 "P3" V 5422 3756 50  0000 R CNN
@@ -736,7 +733,7 @@ F 3 "" H 5550 4000 50  0000 C CNN
 	0    -1   1    0   
 $EndComp
 $Comp
-L CONN_01X04 P12
+L pi-adapter-rescue:CONN_01X04 P12
 U 1 1 56C22C4D
 P 6050 2850
 F 0 "P12" V 6015 2606 50  0000 R CNN
@@ -757,7 +754,7 @@ Wire Wire Line
 Wire Wire Line
 	5250 3550 5600 3550
 $Comp
-L CONN_01X04 P11
+L pi-adapter-rescue:CONN_01X04 P11
 U 1 1 56C22C58
 P 6050 3750
 F 0 "P11" V 5922 3506 50  0000 R CNN
@@ -786,7 +783,7 @@ Wire Wire Line
 Wire Wire Line
 	5900 3400 5900 3550
 $Comp
-L GND #PWR023
+L pi-adapter-rescue:GND #PWR023
 U 1 1 56C22C65
 P 6400 3450
 F 0 "#PWR023" H 6400 3450 30  0001 C CNN
@@ -835,7 +832,7 @@ Wire Wire Line
 Text Notes 5150 2600 0    60   ~ 0
 GND CLK DO +5V\n
 $Comp
-L CONN_01X04 P6
+L pi-adapter-rescue:CONN_01X04 P6
 U 1 1 56C22D24
 P 5550 4400
 F 0 "P6" V 5515 4156 50  0000 R CNN
@@ -846,7 +843,7 @@ F 3 "" H 5550 4400 50  0000 C CNN
 	0    -1   -1   0   
 $EndComp
 $Comp
-L CONN_01X04 P5
+L pi-adapter-rescue:CONN_01X04 P5
 U 1 1 56C22D2A
 P 5550 5700
 F 0 "P5" V 5422 5456 50  0000 R CNN
@@ -857,7 +854,7 @@ F 3 "" H 5550 5700 50  0000 C CNN
 	0    -1   1    0   
 $EndComp
 $Comp
-L CONN_01X04 P14
+L pi-adapter-rescue:CONN_01X04 P14
 U 1 1 56C22D30
 P 6050 4550
 F 0 "P14" V 6015 4306 50  0000 R CNN
@@ -878,7 +875,7 @@ Wire Wire Line
 Wire Wire Line
 	5250 5250 5600 5250
 $Comp
-L CONN_01X04 P13
+L pi-adapter-rescue:CONN_01X04 P13
 U 1 1 56C22D3B
 P 6050 5450
 F 0 "P13" V 5922 5206 50  0000 R CNN
@@ -907,7 +904,7 @@ Wire Wire Line
 Wire Wire Line
 	5900 5100 5900 5250
 $Comp
-L GND #PWR024
+L pi-adapter-rescue:GND #PWR024
 U 1 1 56C22D48
 P 6400 5150
 F 0 "#PWR024" H 6400 5150 30  0001 C CNN
@@ -956,7 +953,7 @@ Wire Wire Line
 Text Notes 5150 4300 0    60   ~ 0
 GND CLK DO +5V\n
 $Comp
-L CONN_01X04 P8
+L pi-adapter-rescue:CONN_01X04 P8
 U 1 1 56C22EEF
 P 5550 6200
 F 0 "P8" V 5515 5956 50  0000 R CNN
@@ -967,7 +964,7 @@ F 3 "" H 5550 6200 50  0000 C CNN
 	0    -1   -1   0   
 $EndComp
 $Comp
-L CONN_01X04 P7
+L pi-adapter-rescue:CONN_01X04 P7
 U 1 1 56C22EF5
 P 5550 7500
 F 0 "P7" V 5422 7256 50  0000 R CNN
@@ -978,7 +975,7 @@ F 3 "" H 5550 7500 50  0000 C CNN
 	0    -1   1    0   
 $EndComp
 $Comp
-L CONN_01X04 P16
+L pi-adapter-rescue:CONN_01X04 P16
 U 1 1 56C22EFB
 P 6050 6350
 F 0 "P16" V 6015 6106 50  0000 R CNN
@@ -999,7 +996,7 @@ Wire Wire Line
 Wire Wire Line
 	5250 7050 5600 7050
 $Comp
-L CONN_01X04 P15
+L pi-adapter-rescue:CONN_01X04 P15
 U 1 1 56C22F06
 P 6050 7250
 F 0 "P15" V 5922 7006 50  0000 R CNN
@@ -1028,7 +1025,7 @@ Wire Wire Line
 Wire Wire Line
 	5900 6900 5900 7050
 $Comp
-L GND #PWR025
+L pi-adapter-rescue:GND #PWR025
 U 1 1 56C22F13
 P 6400 6950
 F 0 "#PWR025" H 6400 6950 30  0001 C CNN
@@ -1083,7 +1080,7 @@ Wire Wire Line
 Wire Wire Line
 	1400 3800 1900 3800
 $Comp
-L CONN_01X06 P22
+L pi-adapter-rescue:CONN_01X06 P22
 U 1 1 56C265D6
 P 1200 3850
 F 0 "P22" H 1119 3368 50  0000 C CNN
@@ -1115,7 +1112,7 @@ MISO
 Text Label 1500 3800 0    60   ~ 0
 SCLK
 $Comp
-L PWR_FLAG #FLG026
+L pi-adapter-rescue:PWR_FLAG #FLG026
 U 1 1 56CA81D8
 P 2550 1600
 F 0 "#FLG026" H 2550 1695 50  0001 C CNN
@@ -1131,7 +1128,7 @@ Wire Wire Line
 Wire Wire Line
 	1950 1450 1950 1600
 $Comp
-L PWR_FLAG #FLG027
+L pi-adapter-rescue:PWR_FLAG #FLG027
 U 1 1 56CA8545
 P 1950 1450
 F 0 "#FLG027" H 1950 1545 50  0001 C CNN
@@ -1145,7 +1142,7 @@ Connection ~ 1950 1450
 Wire Wire Line
 	2400 2700 2450 2700
 $Comp
-L GND #PWR028
+L pi-adapter-rescue:GND #PWR028
 U 1 1 56CF0349
 P 2500 4100
 F 0 "#PWR028" H 2500 4100 30  0001 C CNN
@@ -1177,7 +1174,7 @@ TxD
 Text Label 2600 3100 0    60   ~ 0
 RxD
 $Comp
-L GND #PWR?
+L pi-adapter-rescue:GND #PWR?
 U 1 1 5934A175
 P 1400 3000
 F 0 "#PWR?" H 1400 3000 30  0001 C CNN

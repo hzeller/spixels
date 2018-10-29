@@ -1,0 +1,3 @@
+(sym_lib_table
+  (lib (name pi-adapter-rescue)(type Legacy)(uri ${KIPRJMOD}/pi-adapter-rescue.lib)(options "")(descr ""))
+)
