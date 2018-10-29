@@ -32,6 +32,3 @@ ModuleOutlineThickness=0.15
 version=1
 LibDir=
 [eeschema/libraries]
-LibName1=power
-LibName2=conn
-LibName3=74xx
