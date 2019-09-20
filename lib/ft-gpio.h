@@ -33,31 +33,46 @@ public:
     // Initialize before use. Returns 'true' if successful, 'false' otherwise
     // (e.g. due to a permission problem).
     bool Init();
-    
+
     // Add given gpio pin as output.
     bool AddOutput(int gpio);
 
     // Set the bits that are '1' in the output. Leave the rest untouched.
-    inline void SetBits(uint32_t value) {
-        if (!value) return;
-        *gpio_set_bits_ = value;
+    inline void SetBits(uint32_t bits) {
+        // This test avoids a write that takes a long time.
+        // But direct-multi-spi{} needs this method to take the same amount of time,
+        // no matter what the data is, so don't do it.
+//      if (!bits) return;
+        *gpio_set_bits_ = bits;
     }
 
     // Clear the bits that are '1' in the output. Leave the rest untouched.
-    inline void ClearBits(uint32_t value) {
-        if (!value) return;
-        *gpio_clr_bits_ = value;
+    inline void ClearBits(uint32_t bits) {
+        // This test avoids a write that takes a long time.
+        // But direct-multi-spi{} needs this method to take the same amount of time,
+        // no matter what the data is, so don't do it.
+//      if (!bits) return;
+        *gpio_clr_bits_ = bits;
     }
 
-    // Write only the bits of "value" mentioned in "mask".
-    inline void WriteMaskedBits(uint32_t value, uint32_t mask) {
+    // Write only the bits of "bits" mentioned in "mask".
+    inline void WriteMaskedBits(uint32_t bits, uint32_t mask) {
         // Writing a word is two operations. The IO is actually pretty slow, so
         // this should probably  be unnoticable.
-        ClearBits(~value & mask);
-        SetBits(value & mask);
+        ClearBits(~bits & mask);
+        SetBits(bits & mask);
     }
 
-    inline void Write(uint32_t value) { WriteMaskedBits(value, output_bits_); }
+    inline void Write(uint32_t bits) {
+        ClearBits(~bits & output_bits_);
+        SetBits(bits & output_bits_);
+    }
+    inline void Set(uint32_t bits) {
+        SetBits(bits & output_bits_);
+    }
+    inline void Clear(uint32_t bits) {
+        ClearBits(bits & output_bits_);
+    }
 
 private:
     uint32_t output_bits_;

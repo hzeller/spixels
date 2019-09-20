@@ -32,7 +32,16 @@ class LEDStrip {
 public:
     virtual ~LEDStrip() {};
 
-    inline int pixelCount() const {
+    enum ComponentOrder {
+        Order_RGB = 0x012,
+        Order_RBG = 0x021,
+        Order_GRB = 0x102,
+        Order_GBR = 0x120,
+        Order_BRG = 0x201,
+        Order_BGR = 0x210,
+    };
+
+    int pixelCount() const {
         return pixelCount_;
     }
 
@@ -91,11 +100,16 @@ protected:
 // "spi"       The MultiSPI instance
 // "connector" The connector on the breakout board, such as MultiSPI::SPI_P1
 // "pixelCount"     Number of LEDs.
-LEDStrip *CreateWS2801Strip(MultiSPI *spi, MultiSPI::Pin pin, int pixelCount);
-LEDStrip *CreateLPD6803Strip(MultiSPI *spi, MultiSPI::Pin pin, int pixelCount);
-LEDStrip *CreateLPD8806Strip(MultiSPI *spi, MultiSPI::Pin pin, int pixelCount);
-LEDStrip *CreateAPA102Strip(MultiSPI *spi, MultiSPI::Pin pin, int pixelCount);
-LEDStrip *CreateSK9822Strip(MultiSPI *spi, MultiSPI::Pin pin, int pixelCount);
+LEDStrip *CreateWS2801Strip(MultiSPI *spi, MultiSPI::Pin pin, int pixelCount,
+                            LEDStrip::ComponentOrder component_order);
+LEDStrip *CreateLPD6803Strip(MultiSPI *spi, MultiSPI::Pin pin, int pixelCount,
+                                LEDStrip::ComponentOrder component_order);
+LEDStrip *CreateLPD8806Strip(MultiSPI *spi, MultiSPI::Pin pin, int pixelCount,
+                                LEDStrip::ComponentOrder component_order);
+LEDStrip *CreateAPA102Strip(MultiSPI *spi, MultiSPI::Pin pin, int pixelCount,
+                            LEDStrip::ComponentOrder component_order);
+LEDStrip *CreateSK9822Strip(MultiSPI *spi, MultiSPI::Pin pin, int pixelCount,
+                            LEDStrip::ComponentOrder component_order);
 }
 
 #endif // SPIXELS_LED_STRIP_H
