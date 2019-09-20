@@ -26,8 +26,10 @@
 namespace spixels {
 
 
-LEDStrip::LEDStrip(int pixelCount)
-: pixelCount_(pixelCount) {
+LEDStrip::LEDStrip(int pixelCount, int ledsPerPixel)
+: pixelCount_(pixelCount)
+, ledsPerPixel_(ledsPerPixel)
+{
     redScale_ = 1.0f;
     greenScale_ = 1.0f;
     blueScale_ = 1.0f;
@@ -50,15 +52,19 @@ namespace {
 
 class WS2801LedStrip : public LEDStrip {
 public:
-    WS2801LedStrip(MultiSPI *spi, MultiSPI::Pin pin, int pixelCount, ComponentOrder component_order)
-    : LEDStrip(pixelCount)
+    WS2801LedStrip(MultiSPI *spi, MultiSPI::Pin pin,
+                    int pixelCount, int ledsPerPixel,
+                    ComponentOrder component_order)
+    : LEDStrip(pixelCount, ledsPerPixel)
     , spi_(spi)
-    , pin_(pin) 
+    , pin_(pin)
     , red_offset_(component_order >> 8)
     , green_offset_((component_order >> 4) & 0xF)
     , blue_offset_(component_order & 0xF)
     {
-        const size_t frame_bytes = WS_start_frame_bytes + WS_pixel_bytes * pixelCount + WS_end_frame_bytes;
+        const size_t frame_bytes = WS_start_frame_bytes +
+                                    WS_pixel_bytes * pixelCount * ledsPerPixel +
+                                    WS_end_frame_bytes;
 
         spi_->RegisterDataGPIO(pin, frame_bytes);
     }
@@ -69,11 +75,22 @@ public:
             green = (uint8_t)std::min(green * greenScale16_ / 0x10000, (uint32_t)0xFF);
             blue = (uint8_t)std::min(blue * blueScale16_ / 0x10000, (uint32_t)0xFF);
 
-            uint32_t        const offset = WS_start_frame_bytes + WS_pixel_bytes * pixel_index;
+            uint32_t        offset;
+            int             ledCountdown;
 
-            spi_->SetBufferedByte(pin_, offset + red_offset_, blue);
-            spi_->SetBufferedByte(pin_, offset + green_offset_, green);
-            spi_->SetBufferedByte(pin_, offset + blue_offset_, red);
+            offset = WS_start_frame_bytes + WS_pixel_bytes * pixel_index * ledsPerPixel_;
+            ledCountdown = ledsPerPixel_;
+            while (1)
+            {
+                spi_->SetBufferedByte(pin_, offset + red_offset_, blue);
+                spi_->SetBufferedByte(pin_, offset + green_offset_, green);
+                spi_->SetBufferedByte(pin_, offset + blue_offset_, red);
+                if (--ledCountdown <= 0)
+                {
+                    break;
+                }
+                offset += WS_pixel_bytes;
+            }
         }
     }
 
@@ -95,13 +112,17 @@ private:
 
 class LPD6803LedStrip : public LEDStrip {
 public:
-    LPD6803LedStrip(MultiSPI *spi, MultiSPI::Pin pin, int pixelCount, ComponentOrder component_order)
-    : LEDStrip(pixelCount)
+    LPD6803LedStrip(MultiSPI *spi, MultiSPI::Pin pin,
+                    int pixelCount, int ledsPerPixel,
+                    ComponentOrder component_order)
+    : LEDStrip(pixelCount, ledsPerPixel)
     , spi_(spi)
     , pin_(pin)
     , component_order_(component_order)
     {
-        const size_t frame_bytes = LPD6803_start_frame_bytes + LPD6803_pixel_bytes * pixelCount + LPD6803_end_frame_bytes;
+        const size_t frame_bytes = LPD6803_start_frame_bytes +
+                                    LPD6803_pixel_bytes * pixelCount * ledsPerPixel +
+                                    LPD6803_end_frame_bytes;
 
         spi_->RegisterDataGPIO(pin, frame_bytes);
 
@@ -126,7 +147,7 @@ public:
             uint16_t        data;
 
             data = (1<<15);  // start bit
-            
+
             switch (component_order_)
             {
             case Order_RGB :
@@ -162,10 +183,21 @@ public:
                 break;
             }
 
-            uint32_t        const offset = LPD6803_start_frame_bytes + LPD6803_pixel_bytes * pixel_index;
+            uint32_t        offset;
+            int             ledCountdown;
 
-            spi_->SetBufferedByte(pin_, offset + 0, data >> 8);
-            spi_->SetBufferedByte(pin_, offset + 1, data & 0xFF);
+            offset = LPD6803_start_frame_bytes + LPD6803_pixel_bytes * pixel_index * ledsPerPixel_;
+            ledCountdown = ledsPerPixel_;
+            while (1)
+            {
+                spi_->SetBufferedByte(pin_, offset + 0, data >> 8);
+                spi_->SetBufferedByte(pin_, offset + 1, data & 0xFF);
+                if (--ledCountdown <= 0)
+                {
+                    break;
+                }
+                offset += LPD6803_pixel_bytes;
+            }
         }
     }
 
@@ -185,8 +217,10 @@ private:
 
 class LPD8806_LedStrip : public LEDStrip {
 public:
-    LPD8806_LedStrip(MultiSPI *spi, MultiSPI::Pin pin, int pixelCount, ComponentOrder component_order)
-    : LEDStrip(pixelCount)
+    LPD8806_LedStrip(MultiSPI *spi, MultiSPI::Pin pin,
+                        int pixelCount, int ledsPerPixel,
+                        ComponentOrder component_order)
+    : LEDStrip(pixelCount, ledsPerPixel)
     , spi_(spi)
     , pin_(pin)
     , red_offset_(component_order >> 8)
@@ -194,7 +228,7 @@ public:
     , blue_offset_(component_order & 0xF)
     {
         const size_t frame_bytes = LPD8806_start_frame_bytes +
-                                    LPD8806_pixel_bytes * pixelCount +
+                                    LPD8806_pixel_bytes * pixelCount * ledsPerPixel+
                                     LPD8806_end_frame_bytes;
 
         spi_->RegisterDataGPIO(pin, frame_bytes);
@@ -210,15 +244,26 @@ public:
 
     virtual void SetPixel8(uint32_t pixel_index, uint8_t red, uint8_t green, uint8_t blue) {
         if (pixel_index < (uint32_t)pixelCount_) {
-            uint32_t        const offset = LPD8806_start_frame_bytes + LPD8806_pixel_bytes * pixel_index;
-
             red = (uint8_t)std::min(red * redScale16_ / 0x10000, (uint32_t)0xFF);
             green = (uint8_t)std::min(green * greenScale16_ / 0x10000, (uint32_t)0xFF);
             blue = (uint8_t)std::min(blue * blueScale16_ / 0x10000, (uint32_t)0xFF);
 
-            spi_->SetBufferedByte(pin_, offset + red_offset_, (uint8_t)((red >> 1) | 0x80));
-            spi_->SetBufferedByte(pin_, offset + green_offset_, (uint8_t)((green >> 1) | 0x80));
-            spi_->SetBufferedByte(pin_, offset + blue_offset_, (uint8_t)((blue >> 1) | 0x80));
+            uint32_t        offset;
+            int             ledCountdown;
+
+            offset = LPD8806_start_frame_bytes + LPD8806_pixel_bytes * pixel_index * ledsPerPixel_;
+            ledCountdown = ledsPerPixel_;
+            while (1)
+            {
+                spi_->SetBufferedByte(pin_, offset + red_offset_, (uint8_t)((red >> 1) | 0x80));
+                spi_->SetBufferedByte(pin_, offset + green_offset_, (uint8_t)((green >> 1) | 0x80));
+                spi_->SetBufferedByte(pin_, offset + blue_offset_, (uint8_t)((blue >> 1) | 0x80));
+                if (--ledCountdown <= 0)
+                {
+                    break;
+                }
+                offset += LPD8806_pixel_bytes;
+            }
         }
     }
 
@@ -248,15 +293,17 @@ private:
 
 class APA102LedStrip : public LEDStrip {
 public:
-    APA102LedStrip(MultiSPI *spi, MultiSPI::Pin pin, int pixelCount, ComponentOrder component_order)
-    : LEDStrip(pixelCount)
+    APA102LedStrip(MultiSPI *spi, MultiSPI::Pin pin,
+                    int pixelCount, int ledsPerPixel,
+                    ComponentOrder component_order)
+    : LEDStrip(pixelCount, ledsPerPixel)
     , spi_(spi)
     , pin_(pin)
     , red_offset_(3 - (component_order >> 8))
     , green_offset_(3 - ((component_order >> 4) & 0xF))
     , blue_offset_(3 - (component_order & 0xF))
     {
-        const size_t pixels_bytes = APA_pixel_bytes * pixelCount;
+        const size_t pixels_bytes = APA_pixel_bytes * pixelCount * ledsPerPixel;
         const size_t end_frame_bytes = APA_latch_frame_bytes + (pixelCount + 15) / 16;
         const size_t frame_bytes = APA_start_frame_bytes + pixels_bytes + end_frame_bytes;
 
@@ -320,12 +367,23 @@ public:
             green = (uint8_t)std::min(green * componentsGreenScale16_ / 0x10000u, 0xFFu);
             blue = (uint8_t)std::min(blue * componentsBlueScale16_ / 0x10000u, 0xFFu);
 
-            int             const offset = APA_start_frame_bytes + APA_pixel_bytes * pixel_index;
+            uint32_t        offset;
+            int             ledCountdown;
 
-            spi_->SetBufferedByte(pin_, offset + 0, hardwareBrightnessByte_);
-            spi_->SetBufferedByte(pin_, offset + red_offset_, red);
-            spi_->SetBufferedByte(pin_, offset + green_offset_, green);
-            spi_->SetBufferedByte(pin_, offset + blue_offset_, blue);
+            offset = APA_start_frame_bytes + APA_pixel_bytes * pixel_index * ledsPerPixel_;
+            ledCountdown = ledsPerPixel_;
+            while (1)
+            {
+                spi_->SetBufferedByte(pin_, offset + 0, hardwareBrightnessByte_);
+                spi_->SetBufferedByte(pin_, offset + red_offset_, red);
+                spi_->SetBufferedByte(pin_, offset + green_offset_, green);
+                spi_->SetBufferedByte(pin_, offset + blue_offset_, blue);
+                if (--ledCountdown <= 0)
+                {
+                    break;
+                }
+                offset += APA_pixel_bytes;
+            }
         }
     }
 
@@ -344,12 +402,23 @@ public:
             green = (uint16_t)std::min(green * hardwareInverse8 / 0x10000, 0xFFu);
             blue = (uint16_t)std::min(blue * hardwareInverse8 / 0x10000, 0xFFu);
 
-            int             const offset = APA_start_frame_bytes + APA_pixel_bytes * pixel_index;
+            uint32_t        offset;
+            int             ledCountdown;
 
-            spi_->SetBufferedByte(pin_, offset + 0, (uint8_t)(0xE0 | hardwareScale5));
-            spi_->SetBufferedByte(pin_, offset + red_offset_, (uint8_t)red);
-            spi_->SetBufferedByte(pin_, offset + green_offset_, (uint8_t)green);
-            spi_->SetBufferedByte(pin_, offset + blue_offset_, (uint8_t)blue);
+            offset = APA_start_frame_bytes + APA_pixel_bytes * pixel_index * ledsPerPixel_;
+            ledCountdown = ledsPerPixel_;
+            while (1)
+            {
+                spi_->SetBufferedByte(pin_, offset + 0, (uint8_t)(0xE0 | hardwareScale5));
+                spi_->SetBufferedByte(pin_, offset + red_offset_, (uint8_t)red);
+                spi_->SetBufferedByte(pin_, offset + green_offset_, (uint8_t)green);
+                spi_->SetBufferedByte(pin_, offset + blue_offset_, (uint8_t)blue);
+                if (--ledCountdown <= 0)
+                {
+                    break;
+                }
+                offset += APA_pixel_bytes;
+            }
         }
     }
 
@@ -389,15 +458,17 @@ uint32_t        APA102LedStrip::hardwareInverseTable8_[32];
 
 class SK9822LedStrip : public LEDStrip {
 public:
-    SK9822LedStrip(MultiSPI *spi, MultiSPI::Pin pin, int pixelCount, ComponentOrder component_order)
-    : LEDStrip(pixelCount)
+    SK9822LedStrip(MultiSPI *spi, MultiSPI::Pin pin,
+                    int pixelCount, int ledsPerPixel,
+                    ComponentOrder component_order)
+    : LEDStrip(pixelCount, ledsPerPixel)
     , spi_(spi)
     , pin_(pin)
     , red_offset_(3 - (component_order >> 8))
     , green_offset_(3 - ((component_order >> 4) & 0xF))
     , blue_offset_(3 - (component_order & 0xF))
     {
-        const size_t pixels_bytes = APA_pixel_bytes * pixelCount;
+        const size_t pixels_bytes = APA_pixel_bytes * pixelCount * ledsPerPixel;
         const size_t end_frame_bytes = APA_latch_frame_bytes + (pixelCount + 15) / 16;
         const size_t frame_bytes = APA_start_frame_bytes + pixels_bytes + end_frame_bytes;
 
@@ -465,12 +536,23 @@ public:
             green = (uint8_t)std::min(green * componentsGreenScale16_ / 0x10000u, 0xFFu);
             blue = (uint8_t)std::min(blue * componentsBlueScale16_ / 0x10000u, 0xFFu);
 
-            int             const offset = APA_start_frame_bytes + APA_pixel_bytes * pixel_index;
+            uint32_t        offset;
+            int             ledCountdown;
 
-            spi_->SetBufferedByte(pin_, offset + 0, hardwareBrightnessByte_);
-            spi_->SetBufferedByte(pin_, offset + red_offset_, red);
-            spi_->SetBufferedByte(pin_, offset + green_offset_, green);
-            spi_->SetBufferedByte(pin_, offset + blue_offset_, blue);
+            offset = APA_start_frame_bytes + APA_pixel_bytes * pixel_index * ledsPerPixel_;
+            ledCountdown = ledsPerPixel_;
+            while (1)
+            {
+                spi_->SetBufferedByte(pin_, offset + 0, hardwareBrightnessByte_);
+                spi_->SetBufferedByte(pin_, offset + red_offset_, red);
+                spi_->SetBufferedByte(pin_, offset + green_offset_, green);
+                spi_->SetBufferedByte(pin_, offset + blue_offset_, blue);
+                if (--ledCountdown <= 0)
+                {
+                    break;
+                }
+                offset += APA_pixel_bytes;
+            }
         }
     }
 
@@ -488,12 +570,23 @@ public:
             green = (uint16_t)std::min(green * hardwareGreenInverseTable8_[hardwareScale5] / 0x10000, 0xFFu);
             blue = (uint16_t)std::min(blue * hardwareBlueInverseTable8_[hardwareScale5] / 0x10000, 0xFFu);
 
-            int             const offset = APA_start_frame_bytes + APA_pixel_bytes * pixel_index;
+            uint32_t        offset;
+            int             ledCountdown;
 
-            spi_->SetBufferedByte(pin_, offset + 0, (uint8_t)(0xE0 | hardwareScale5));
-            spi_->SetBufferedByte(pin_, offset + red_offset_, (uint8_t)red);
-            spi_->SetBufferedByte(pin_, offset + green_offset_, (uint8_t)green);
-            spi_->SetBufferedByte(pin_, offset + blue_offset_, (uint8_t)blue);
+            offset = APA_start_frame_bytes + APA_pixel_bytes * pixel_index * ledsPerPixel_;
+            ledCountdown = ledsPerPixel_;
+            while (1)
+            {
+                spi_->SetBufferedByte(pin_, offset + 0, (uint8_t)(0xE0 | hardwareScale5));
+                spi_->SetBufferedByte(pin_, offset + red_offset_, (uint8_t)red);
+                spi_->SetBufferedByte(pin_, offset + green_offset_, (uint8_t)green);
+                spi_->SetBufferedByte(pin_, offset + blue_offset_, (uint8_t)blue);
+                if (--ledCountdown <= 0)
+                {
+                    break;
+                }
+                offset += APA_pixel_bytes;
+            }
         }
     }
 
@@ -526,25 +619,25 @@ uint32_t        SK9822LedStrip::hardwareBlueInverseTable8_[32];
 
 
 // Public interface
-LEDStrip *CreateWS2801Strip(MultiSPI *spi, MultiSPI::Pin pin, int pixelCount,
+LEDStrip *CreateWS2801Strip(MultiSPI *spi, MultiSPI::Pin pin, int pixelCount, int ledsPerPixel,
                             LEDStrip::ComponentOrder component_order) {
-    return new WS2801LedStrip(spi, pin, pixelCount, component_order);
+    return new WS2801LedStrip(spi, pin, pixelCount, ledsPerPixel, component_order);
 }
-LEDStrip *CreateLPD6803Strip(MultiSPI *spi, MultiSPI::Pin pin, int pixelCount,
+LEDStrip *CreateLPD6803Strip(MultiSPI *spi, MultiSPI::Pin pin, int pixelCount, int ledsPerPixel,
                                 LEDStrip::ComponentOrder component_order) {
-    return new LPD6803LedStrip(spi, pin, pixelCount, component_order);
+    return new LPD6803LedStrip(spi, pin, pixelCount, ledsPerPixel, component_order);
 }
-LEDStrip *CreateLPD8806Strip(MultiSPI *spi, MultiSPI::Pin pin, int pixelCount,
+LEDStrip *CreateLPD8806Strip(MultiSPI *spi, MultiSPI::Pin pin, int pixelCount, int ledsPerPixel,
                                 LEDStrip::ComponentOrder component_order) {
-    return new LPD8806_LedStrip(spi, pin, pixelCount, component_order);
+    return new LPD8806_LedStrip(spi, pin, pixelCount, ledsPerPixel, component_order);
 }
-LEDStrip *CreateAPA102Strip(MultiSPI *spi, MultiSPI::Pin pin, int pixelCount,
+LEDStrip *CreateAPA102Strip(MultiSPI *spi, MultiSPI::Pin pin, int pixelCount, int ledsPerPixel,
                             LEDStrip::ComponentOrder component_order) {
-    return new APA102LedStrip(spi, pin, pixelCount, component_order);
+    return new APA102LedStrip(spi, pin, pixelCount, ledsPerPixel, component_order);
 }
-LEDStrip *CreateSK9822Strip(MultiSPI *spi, MultiSPI::Pin pin, int pixelCount,
+LEDStrip *CreateSK9822Strip(MultiSPI *spi, MultiSPI::Pin pin, int pixelCount, int ledsPerPixel,
                             LEDStrip::ComponentOrder component_order) {
-    return new SK9822LedStrip(spi, pin, pixelCount, component_order);
+    return new SK9822LedStrip(spi, pin, pixelCount, ledsPerPixel, component_order);
 }
 
 

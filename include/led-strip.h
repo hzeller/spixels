@@ -44,6 +44,9 @@ public:
     int pixelCount() const {
         return pixelCount_;
     }
+    int ledsPerPixel() const {
+        return ledsPerPixel_;
+    }
 
     void SetBrightnessScale(float scale16) {
         SetBrightnessScale(scale16, scale16, scale16);
@@ -82,9 +85,10 @@ public:
     }
 
 protected:
-    LEDStrip(int pixelCount);
+    LEDStrip(int pixelCount, int ledsPerPixel);
 
     int         const pixelCount_;
+    int         const ledsPerPixel_;
 
     float       redScale_;
     float       greenScale_;
@@ -100,15 +104,20 @@ protected:
 // "spi"       The MultiSPI instance
 // "connector" The connector on the breakout board, such as MultiSPI::SPI_P1
 // "pixelCount"     Number of LEDs.
-LEDStrip *CreateWS2801Strip(MultiSPI *spi, MultiSPI::Pin pin, int pixelCount,
+LEDStrip *CreateWS2801Strip(MultiSPI *spi, MultiSPI::Pin pin,
+                            int pixelCount, int ledsPerPixel,
                             LEDStrip::ComponentOrder component_order);
-LEDStrip *CreateLPD6803Strip(MultiSPI *spi, MultiSPI::Pin pin, int pixelCount,
+LEDStrip *CreateLPD6803Strip(MultiSPI *spi, MultiSPI::Pin pin,
+                                int pixelCount, int ledsPerPixel,
                                 LEDStrip::ComponentOrder component_order);
-LEDStrip *CreateLPD8806Strip(MultiSPI *spi, MultiSPI::Pin pin, int pixelCount,
+LEDStrip *CreateLPD8806Strip(MultiSPI *spi, MultiSPI::Pin pin,
+                                int pixelCount, int ledsPerPixel,
                                 LEDStrip::ComponentOrder component_order);
-LEDStrip *CreateAPA102Strip(MultiSPI *spi, MultiSPI::Pin pin, int pixelCount,
+LEDStrip *CreateAPA102Strip(MultiSPI *spi, MultiSPI::Pin pin,
+                            int pixelCount, int ledsPerPixel,
                             LEDStrip::ComponentOrder component_order);
-LEDStrip *CreateSK9822Strip(MultiSPI *spi, MultiSPI::Pin pin, int pixelCount,
+LEDStrip *CreateSK9822Strip(MultiSPI *spi, MultiSPI::Pin pin,
+                            int pixelCount, int ledsPerPixel,
                             LEDStrip::ComponentOrder component_order);
 }
 
