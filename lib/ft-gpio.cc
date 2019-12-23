@@ -32,6 +32,7 @@
 // Raspberry 1 and 2 have different base addresses for the periphery
 #define BCM2708_PERI_BASE        0x20000000
 #define BCM2709_PERI_BASE        0x3F000000
+#define BCM2711_PERI_BASE        0xFE000000
 
 #define GPIO_REGISTER_OFFSET         0x200000
 
@@ -75,31 +76,93 @@ bool GPIO::AddOutput(int bit) {
     return true;
 }
 
-static bool IsRaspberryPi2() {
-    // TODO: there must be a better, more robust way. Can we ask the processor ?
-    char buffer[2048];
-    const int fd = open("/proc/cmdline", O_RDONLY);
-    ssize_t r = read(fd, buffer, sizeof(buffer) - 1); // returns all in one read.
-    buffer[r >= 0 ? r : 0] = '\0';
-    close(fd);
-    const char *mem_size_key;
-    uint64_t mem_size = 0;
-    if ((mem_size_key = strstr(buffer, "mem_size=")) != NULL
-        && (sscanf(mem_size_key + strlen("mem_size="),
-                   "%" PRIx64, &mem_size) == 1)
-        && (mem_size >= 0x3F000000)) {
-        return true;
-    }
-    return false;
+// We are not interested in the _exact_ model, just good enough to determine
+// What to do.
+enum RaspberryPiModel {
+  PI_MODEL_1,
+  PI_MODEL_2,
+  PI_MODEL_3,
+  PI_MODEL_4
+};
+
+static int ReadFileToBuffer(char *buffer, size_t size, const char *filename) {
+  const int fd = open(filename, O_RDONLY);
+  if (fd < 0) return -1;
+  ssize_t r = read(fd, buffer, size - 1); // assume one read enough
+  buffer[r >= 0 ? r : 0] = '\0';
+  close(fd);
+  return r;
 }
 
-static uint32_t *mmap_bcm_register(bool isRPi2, off_t register_offset) {
-    const off_t base = (isRPi2 ? BCM2709_PERI_BASE : BCM2708_PERI_BASE);
+static RaspberryPiModel DetermineRaspberryModel() {
+  char buffer[4096];
+  if (ReadFileToBuffer(buffer, sizeof(buffer), "/proc/cpuinfo") < 0) {
+    fprintf(stderr, "Reading cpuinfo: Could not determine Pi model\n");
+    return PI_MODEL_3;  // safe guess fallback.
+  }
+  static const char RevisionTag[] = "Revision";
+  const char *revision_key;
+  if ((revision_key = strstr(buffer, RevisionTag)) == NULL) {
+    fprintf(stderr, "non-existent Revision: Could not determine Pi model\n");
+    return PI_MODEL_3;
+  }
+  unsigned int pi_revision;
+  if (sscanf(index(revision_key, ':') + 1, "%x", &pi_revision) != 1) {
+    fprintf(stderr, "Unknown Revision: Could not determine Pi model\n");
+    return PI_MODEL_3;
+  }
+
+  // https://www.raspberrypi.org/documentation/hardware/raspberrypi/revision-codes/README.md
+  const unsigned pi_type = (pi_revision >> 4) & 0xff;
+  switch (pi_type) {
+  case 0x00: /* A */
+  case 0x01: /* B, Compute Module 1 */
+  case 0x02: /* A+ */
+  case 0x03: /* B+ */
+  case 0x05: /* Alpha ?*/
+  case 0x06: /* Compute Module1 */
+  case 0x09: /* Zero */
+  case 0x0c: /* Zero W */
+    return PI_MODEL_1;
+
+  case 0x04:  /* Pi 2 */
+    return PI_MODEL_2;
+
+  case 0x11: /* Pi 4 */
+    return PI_MODEL_4;
+
+  default:  /* a bunch of versions represneting Pi 3 */
+    return PI_MODEL_3;
+  }
+}
+
+static RaspberryPiModel GetPiModel() {
+  static RaspberryPiModel pi_model = DetermineRaspberryModel();
+  return pi_model;
+}
+
+// Public interface
+uint32_t *mmap_bcm_register(off_t register_offset) {
+    off_t base = BCM2709_PERI_BASE;  // safe fallback guess.
+    switch (GetPiModel()) {
+    case PI_MODEL_1: base = BCM2708_PERI_BASE; break;
+    case PI_MODEL_2: base = BCM2709_PERI_BASE; break;
+    case PI_MODEL_3: base = BCM2709_PERI_BASE; break;
+    case PI_MODEL_4: base = BCM2711_PERI_BASE; break;
+    }
 
     int mem_fd;
     if ((mem_fd = open("/dev/mem", O_RDWR|O_SYNC) ) < 0) {
-        perror("can't open /dev/mem: ");
-        return NULL;
+        // Try to fall back to /dev/gpiomem. Unfortunately, that device
+        // is implemented in a way that it _only_ supports GPIO, not the
+        // other registers.
+        // But, instead of failing, mmap() then silently succeeds with the
+        // unsupported offset. So bail out here.
+        if (register_offset != GPIO_REGISTER_OFFSET)
+            return NULL;
+
+        mem_fd = open("/dev/gpiomem", O_RDWR|O_SYNC);
+        if (mem_fd < 0) return NULL;
     }
 
     uint32_t *result =
@@ -121,7 +184,7 @@ static uint32_t *mmap_bcm_register(bool isRPi2, off_t register_offset) {
 
 // Based on code example found in http://elinux.org/RPi_Low-level_peripherals
 bool GPIO::Init() {
-    gpio_port_ = mmap_bcm_register(IsRaspberryPi2(), GPIO_REGISTER_OFFSET);
+    gpio_port_ = mmap_bcm_register(GPIO_REGISTER_OFFSET);
     if (gpio_port_ == NULL) {
         return false;
     }

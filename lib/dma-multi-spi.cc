@@ -34,12 +34,6 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#define BCM2708_PI1_PERI_BASE  0x20000000
-#define BCM2709_PI2_PERI_BASE  0x3F000000
-
-#define PERI_BASE BCM2709_PI2_PERI_BASE
-
-#define PAGE_SIZE 4096
 
 // ---- GPIO specific defines
 #define GPIO_REGISTER_BASE 0x200000
@@ -50,35 +44,6 @@
 // ---- DMA specific defines
 #define DMA_CHANNEL       5   // That usually is free.
 #define DMA_BASE          0x007000
-
-// Return a pointer to a periphery subsystem register.
-// TODO: consolidate with gpio file.
-static void *mmap_bcm_register(off_t register_offset) {
-  const off_t base = PERI_BASE;
-
-  int mem_fd;
-  if ((mem_fd = open("/dev/mem", O_RDWR|O_SYNC) ) < 0) {
-    perror("can't open /dev/mem: ");
-    fprintf(stderr, "You need to run this as root!\n");
-    return NULL;
-  }
-
-  uint32_t *result =
-    (uint32_t*) mmap(NULL,                  // Any adddress in our space will do
-                     PAGE_SIZE,
-                     PROT_READ|PROT_WRITE,  // Enable r/w on GPIO registers.
-                     MAP_SHARED,
-                     mem_fd,                // File to map
-                     base + register_offset // Offset to bcm register
-                     );
-  close(mem_fd);
-
-  if (result == MAP_FAILED) {
-    fprintf(stderr, "mmap error %p\n", result);
-    return NULL;
-  }
-  return result;
-}
 
 namespace spixels {
 namespace {
@@ -214,7 +179,7 @@ void DMAMultiSPI::FinishRegistration() {
     start_block_ = (struct dma_cb*) alloced_.mem;
 
     // 4.2.1.2
-    char *dmaBase = (char*)mmap_bcm_register(DMA_BASE);
+    char *dmaBase = (char*) ft::mmap_bcm_register(DMA_BASE);
     dma_channel_ = (struct dma_channel_header*)(dmaBase + 0x100 * DMA_CHANNEL);
 }
 

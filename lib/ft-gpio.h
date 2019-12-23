@@ -19,10 +19,14 @@
 #define RPI_GPIO_H
 
 #include <stdint.h>
+#include <sys/types.h>
 
 // Putting this in our namespace to not collide with other things called like
 // this.
 namespace ft {
+// Memory map a bcm register. Takes care of detecting the right Raspberry Pi
+uint32_t *mmap_bcm_register(off_t register_offset);
+
 class GPIO {
 public:
     // Available bits that actually have pins.
@@ -33,7 +37,7 @@ public:
     // Initialize before use. Returns 'true' if successful, 'false' otherwise
     // (e.g. due to a permission problem).
     bool Init();
-    
+
     // Add given gpio pin as output.
     bool AddOutput(int gpio);
 
