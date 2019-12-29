@@ -7,7 +7,7 @@ SPIXELS_DIR=..
 
 SPIXELS_LIBRARY=$(SPIXELS_DIR)/lib/libspixels.a
 
-LDFLAGS=-L$(SPIXELS_DIR)/lib -lspixels
+LDFLAGS=-L$(SPIXELS_DIR)/lib -lspixels -L/opt/vc/lib -lbcm_host
 INCLUDE_FLAGS=-I$(SPIXELS_DIR)/include
 
 CXXFLAGS=-Wall -O3 $(INCLUDE_FLAGS)
