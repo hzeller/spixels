@@ -1,0 +1,1189 @@
+EESchema Schematic File Version 4
+LIBS:pi-adapter-cache
+EELAYER 26 0
+EELAYER END
+$Descr A4 11693 8268
+encoding utf-8
+Sheet 1 1
+Title ""
+Date ""
+Rev ""
+Comp ""
+Comment1 ""
+Comment2 ""
+Comment3 ""
+Comment4 ""
+$EndDescr
+$Comp
+L pi-adapter-rescue:74HC245-RESCUE-pi-adapter U1
+U 1 1 54ECAC85
+P 4550 1750
+F 0 "U1" H 4650 2325 60  0000 L BNN
+F 1 "74AHCT245" H 4600 1175 60  0000 L TNN
+F 2 "Housings_SSOP:TSSOP-20_4.4x6.5mm_Pitch0.65mm" H 4550 1750 60  0001 C CNN
+F 3 "" H 4550 1750 60  0000 C CNN
+F 4 "74AHCT245PW,118" H 4550 1750 50  0001 C CNN "MPN"
+	1    4550 1750
+	1    0    0    -1  
+$EndComp
+$Comp
+L pi-adapter-rescue:74HC245-RESCUE-pi-adapter U2
+U 1 1 54ECB18C
+P 4550 3450
+F 0 "U2" H 4550 4238 60  0000 C CNN
+F 1 "74AHCT245" H 4550 4132 60  0000 C CNN
+F 2 "Housings_SSOP:TSSOP-20_4.4x6.5mm_Pitch0.65mm" H 4550 3450 60  0001 C CNN
+F 3 "" H 4550 3450 60  0000 C CNN
+F 4 "74AHCT245PW,118" H 4550 3450 50  0001 C CNN "MPN"
+	1    4550 3450
+	1    0    0    -1  
+$EndComp
+$Comp
+L pi-adapter-rescue:74HC245-RESCUE-pi-adapter U3
+U 1 1 54ECB1EA
+P 4550 5150
+F 0 "U3" H 4650 5725 60  0000 L BNN
+F 1 "74AHCT245" H 4600 4575 60  0000 L TNN
+F 2 "Housings_SSOP:TSSOP-20_4.4x6.5mm_Pitch0.65mm" H 4550 5150 60  0001 C CNN
+F 3 "" H 4550 5150 60  0000 C CNN
+F 4 "74AHCT245PW,118" H 4550 5150 50  0001 C CNN "MPN"
+	1    4550 5150
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	2450 2650 2450 2700
+Wire Wire Line
+	2450 2800 2400 2800
+Connection ~ 2450 2700
+$Comp
+L power:GND #PWR01
+U 1 1 54ECB417
+P 2500 3600
+F 0 "#PWR01" H 2500 3600 30  0001 C CNN
+F 1 "GND" H 2500 3530 30  0001 C CNN
+F 2 "" H 2500 3600 60  0000 C CNN
+F 3 "" H 2500 3600 60  0000 C CNN
+	1    2500 3600
+	0    -1   -1   0   
+$EndComp
+Wire Wire Line
+	2400 3600 2500 3600
+$Comp
+L power:GND #PWR02
+U 1 1 54ECB4A1
+P 2500 2900
+F 0 "#PWR02" H 2500 2900 30  0001 C CNN
+F 1 "GND" H 2500 2830 30  0001 C CNN
+F 2 "" H 2500 2900 60  0000 C CNN
+F 3 "" H 2500 2900 60  0000 C CNN
+	1    2500 2900
+	0    -1   -1   0   
+$EndComp
+Wire Wire Line
+	2400 2900 2500 2900
+$Comp
+L power:GND #PWR03
+U 1 1 54ECB5FE
+P 1800 4600
+F 0 "#PWR03" H 1800 4600 30  0001 C CNN
+F 1 "GND" H 1800 4530 30  0001 C CNN
+F 2 "" H 1800 4600 60  0000 C CNN
+F 3 "" H 1800 4600 60  0000 C CNN
+	1    1800 4600
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	1800 4600 1850 4600
+$Comp
+L power:GND #PWR04
+U 1 1 54ECB73E
+P 2500 4300
+F 0 "#PWR04" H 2500 4300 30  0001 C CNN
+F 1 "GND" H 2500 4230 30  0001 C CNN
+F 2 "" H 2500 4300 60  0000 C CNN
+F 3 "" H 2500 4300 60  0000 C CNN
+	1    2500 4300
+	0    -1   -1   0   
+$EndComp
+Wire Wire Line
+	2400 4300 2500 4300
+$Comp
+L power:GND #PWR05
+U 1 1 54ECB7BC
+P 1400 4150
+F 0 "#PWR05" H 1400 4150 30  0001 C CNN
+F 1 "GND" H 1400 4080 30  0001 C CNN
+F 2 "" H 1400 4150 60  0000 C CNN
+F 3 "" H 1400 4150 60  0000 C CNN
+	1    1400 4150
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	1650 3900 1900 3900
+Text GLabel 1900 3000 0    51   Output ~ 0
+D2
+Text GLabel 1900 4100 0    51   Output ~ 0
+D8
+Text GLabel 2400 4200 2    51   Output ~ 0
+D9
+Text GLabel 1900 4200 0    51   Output ~ 0
+D10
+Text GLabel 1900 4400 0    51   Output ~ 0
+D13
+Text GLabel 1900 3300 0    51   Output ~ 0
+clock
+Text GLabel 1900 4500 0    51   Output ~ 0
+D14
+Text GLabel 2400 3500 2    51   Output ~ 0
+D6
+Text GLabel 2400 4600 2    51   Output ~ 0
+D16
+Text GLabel 2400 4500 2    51   Output ~ 0
+D15
+Text GLabel 2400 4400 2    51   Output ~ 0
+D12
+Text GLabel 1900 4300 0    51   Output ~ 0
+D11
+Text GLabel 1900 3400 0    51   Output ~ 0
+D5
+$Comp
+L pi-adapter-rescue:C-RESCUE-pi-adapter C1
+U 1 1 54ECBE4F
+P 1600 5600
+F 0 "C1" H 1600 5700 40  0000 L CNN
+F 1 "100n" H 1606 5515 40  0000 L CNN
+F 2 "Capacitors_SMD:C_0603" H 1638 5450 30  0001 C CNN
+F 3 "" H 1600 5600 60  0000 C CNN
+F 4 "C0603C104Z3VACTU" H 1600 5600 50  0001 C CNN "MPN"
+F 5 "399-1100-1-ND" H 1600 5600 50  0001 C CNN "DigiKey"
+	1    1600 5600
+	1    0    0    -1  
+$EndComp
+$Comp
+L pi-adapter-rescue:C-RESCUE-pi-adapter C2
+U 1 1 54ECBEE4
+P 1900 5600
+F 0 "C2" H 1900 5700 40  0000 L CNN
+F 1 "100n" H 1906 5515 40  0000 L CNN
+F 2 "Capacitors_SMD:C_0603" H 1938 5450 30  0001 C CNN
+F 3 "" H 1900 5600 60  0000 C CNN
+F 4 "C0603C104Z3VACTU" H 1900 5600 50  0001 C CNN "MPN"
+F 5 "399-1100-1-ND" H 1900 5600 50  0001 C CNN "DigiKey"
+	1    1900 5600
+	1    0    0    -1  
+$EndComp
+$Comp
+L pi-adapter-rescue:C-RESCUE-pi-adapter C3
+U 1 1 54ECBF0A
+P 2200 5600
+F 0 "C3" H 2200 5700 40  0000 L CNN
+F 1 "100n" H 2206 5515 40  0000 L CNN
+F 2 "Capacitors_SMD:C_0603" H 2238 5450 30  0001 C CNN
+F 3 "" H 2200 5600 60  0000 C CNN
+F 4 "C0603C104Z3VACTU" H 2200 5600 50  0001 C CNN "MPN"
+F 5 "399-1100-1-ND" H 2200 5600 50  0001 C CNN "DigiKey"
+	1    2200 5600
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR06
+U 1 1 54ECBF56
+P 1900 5850
+F 0 "#PWR06" H 1900 5850 30  0001 C CNN
+F 1 "GND" H 1900 5780 30  0001 C CNN
+F 2 "" H 1900 5850 60  0000 C CNN
+F 3 "" H 1900 5850 60  0000 C CNN
+	1    1900 5850
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	1900 5750 1900 5850
+Wire Wire Line
+	1900 5450 1900 5350
+Connection ~ 1900 5450
+Connection ~ 1900 5750
+$Comp
+L power:VCC #PWR07
+U 1 1 54ECD0C1
+P 1900 5350
+F 0 "#PWR07" H 1900 5450 30  0001 C CNN
+F 1 "VCC" H 1900 5450 30  0000 C CNN
+F 2 "" H 1900 5350 60  0000 C CNN
+F 3 "" H 1900 5350 60  0000 C CNN
+	1    1900 5350
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR08
+U 1 1 54ECF31C
+P 3850 2300
+F 0 "#PWR08" H 3850 2300 30  0001 C CNN
+F 1 "GND" H 3850 2230 30  0001 C CNN
+F 2 "" H 3850 2300 60  0000 C CNN
+F 3 "" H 3850 2300 60  0000 C CNN
+	1    3850 2300
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	3850 2250 3850 2300
+$Comp
+L power:GND #PWR09
+U 1 1 54ECF3AB
+P 3850 4000
+F 0 "#PWR09" H 3850 4000 30  0001 C CNN
+F 1 "GND" H 3850 3930 30  0001 C CNN
+F 2 "" H 3850 4000 60  0000 C CNN
+F 3 "" H 3850 4000 60  0000 C CNN
+	1    3850 4000
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR010
+U 1 1 54ECF608
+P 3850 5700
+F 0 "#PWR010" H 3850 5700 30  0001 C CNN
+F 1 "GND" H 3850 5630 30  0001 C CNN
+F 2 "" H 3850 5700 60  0000 C CNN
+F 3 "" H 3850 5700 60  0000 C CNN
+	1    3850 5700
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	3850 3950 3850 4000
+Wire Wire Line
+	3850 5650 3850 5700
+Text GLabel 3850 1250 0    51   Input ~ 0
+clock
+$Comp
+L power:VCC #PWR011
+U 1 1 54ED6227
+P 3600 2150
+F 0 "#PWR011" H 3600 2250 30  0001 C CNN
+F 1 "VCC" H 3600 2250 30  0000 C CNN
+F 2 "" H 3600 2150 60  0000 C CNN
+F 3 "" H 3600 2150 60  0000 C CNN
+	1    3600 2150
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	3850 2150 3600 2150
+$Comp
+L power:VCC #PWR012
+U 1 1 54ED629A
+P 3600 3850
+F 0 "#PWR012" H 3600 3950 30  0001 C CNN
+F 1 "VCC" H 3600 3950 30  0000 C CNN
+F 2 "" H 3600 3850 60  0000 C CNN
+F 3 "" H 3600 3850 60  0000 C CNN
+	1    3600 3850
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	3600 3850 3850 3850
+$Comp
+L power:VCC #PWR013
+U 1 1 54ED670D
+P 3650 5550
+F 0 "#PWR013" H 3650 5650 30  0001 C CNN
+F 1 "VCC" H 3650 5650 30  0000 C CNN
+F 2 "" H 3650 5550 60  0000 C CNN
+F 3 "" H 3650 5550 60  0000 C CNN
+	1    3650 5550
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	3650 5550 3850 5550
+Text GLabel 1900 3200 0    51   Output ~ 0
+D3
+Text GLabel 2400 3400 2    51   Output ~ 0
+D4
+Text GLabel 2400 3200 2    51   Output ~ 0
+D1
+$Comp
+L pi-adapter-rescue:C-RESCUE-pi-adapter C4
+U 1 1 54F3B6F5
+P 2450 5600
+F 0 "C4" H 2450 5700 40  0000 L CNN
+F 1 "100n" H 2456 5515 40  0000 L CNN
+F 2 "Capacitors_SMD:C_0603" H 2488 5450 30  0001 C CNN
+F 3 "" H 2450 5600 60  0000 C CNN
+F 4 "C0603C104Z3VACTU" H 2450 5600 50  0001 C CNN "MPN"
+F 5 "399-1100-1-ND" H 2450 5600 50  0001 C CNN "DigiKey"
+	1    2450 5600
+	1    0    0    -1  
+$EndComp
+$Comp
+L pi-adapter-rescue:74HC245-RESCUE-pi-adapter U4
+U 1 1 54F3F4A2
+P 4550 6950
+F 0 "U4" H 4650 7525 60  0000 L BNN
+F 1 "74AHCT245" H 4600 6375 60  0000 L TNN
+F 2 "Housings_SSOP:TSSOP-20_4.4x6.5mm_Pitch0.65mm" H 4550 6950 60  0001 C CNN
+F 3 "" H 4550 6950 60  0000 C CNN
+F 4 "74AHCT245PW,118" H 4550 6950 50  0001 C CNN "MPN"
+	1    4550 6950
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR014
+U 1 1 54F3F4AD
+P 3850 7500
+F 0 "#PWR014" H 3850 7500 30  0001 C CNN
+F 1 "GND" H 3850 7430 30  0001 C CNN
+F 2 "" H 3850 7500 60  0000 C CNN
+F 3 "" H 3850 7500 60  0000 C CNN
+	1    3850 7500
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	3850 7450 3850 7500
+Text GLabel 3850 6450 0    51   Input ~ 0
+clock
+$Comp
+L power:VCC #PWR015
+U 1 1 54F3F4B9
+P 3650 7350
+F 0 "#PWR015" H 3650 7450 30  0001 C CNN
+F 1 "VCC" H 3650 7450 30  0000 C CNN
+F 2 "" H 3650 7350 60  0000 C CNN
+F 3 "" H 3650 7350 60  0000 C CNN
+	1    3650 7350
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	3650 7350 3850 7350
+NoConn ~ 1900 4000
+NoConn ~ 2400 4000
+NoConn ~ 1900 3500
+$Comp
+L power:PWR_FLAG #FLG016
+U 1 1 557B23A7
+P 1850 4700
+F 0 "#FLG016" H 1850 4795 50  0001 C CNN
+F 1 "PWR_FLAG" H 1850 4880 50  0000 C CNN
+F 2 "" H 1850 4700 60  0000 C CNN
+F 3 "" H 1850 4700 60  0000 C CNN
+	1    1850 4700
+	-1   0    0    1   
+$EndComp
+Wire Wire Line
+	1850 4600 1850 4700
+Connection ~ 1850 4600
+$Comp
+L power:VCC #PWR018
+U 1 1 562B12CC
+P 1600 1850
+F 0 "#PWR018" H 1600 1950 30  0001 C CNN
+F 1 "VCC" H 1600 1950 30  0000 C CNN
+F 2 "" H 1600 1850 60  0000 C CNN
+F 3 "" H 1600 1850 60  0000 C CNN
+	1    1600 1850
+	0    1    1    0   
+$EndComp
+Text Notes 550  1450 0    60   ~ 0
+LED Power
+$Comp
+L pi-adapter-rescue:C_Small-RESCUE-pi-adapter C6
+U 1 1 562B2FF4
+P 1300 5600
+F 0 "C6" H 1310 5670 50  0000 L CNN
+F 1 "22u" H 1250 5750 50  0000 L CNN
+F 2 "Capacitors_SMD:C_1206_HandSoldering" H 1300 5600 60  0001 C CNN
+F 3 "" H 1300 5600 60  0000 C CNN
+F 4 "CL31A226MQHNNNE" H 1300 5600 50  0001 C CNN "MPN"
+	1    1300 5600
+	1    0    0    -1  
+$EndComp
+$Comp
+L pi-adapter-rescue:CONN_01X01-RESCUE-pi-adapter P30
+U 1 1 562B3873
+P 1100 1300
+F 0 "P30" H 1200 1300 50  0000 C CNN
+F 1 "+5V" V 1200 1300 50  0001 C CNN
+F 2 "Pin_Headers:Pin_Header_Straight_1x01" H 1100 1300 60  0001 C CNN
+F 3 "" H 1100 1300 60  0000 C CNN
+	1    1100 1300
+	-1   0    0    1   
+$EndComp
+$Comp
+L pi-adapter-rescue:CONN_01X01-RESCUE-pi-adapter P31
+U 1 1 562B38C3
+P 1100 1500
+F 0 "P31" H 1200 1500 50  0000 C CNN
+F 1 "GND" V 1200 1500 50  0001 C CNN
+F 2 "Pin_Headers:Pin_Header_Straight_1x01" H 1100 1500 60  0001 C CNN
+F 3 "" H 1100 1500 60  0000 C CNN
+	1    1100 1500
+	-1   0    0    1   
+$EndComp
+Text GLabel 3850 1450 0    51   Input ~ 0
+clock
+Text GLabel 3850 1750 0    51   Input ~ 0
+clock
+Text GLabel 3850 1950 0    51   Input ~ 0
+clock
+Text GLabel 3850 2950 0    51   Input ~ 0
+clock
+Text GLabel 3850 3150 0    51   Input ~ 0
+clock
+Text GLabel 3850 3450 0    51   Input ~ 0
+clock
+Text GLabel 3850 3650 0    51   Input ~ 0
+clock
+Text GLabel 3850 4650 0    51   Input ~ 0
+clock
+Text GLabel 3850 4850 0    51   Input ~ 0
+clock
+Text GLabel 3850 5150 0    51   Input ~ 0
+clock
+Text GLabel 3850 5350 0    51   Input ~ 0
+clock
+Text GLabel 3850 6650 0    51   Input ~ 0
+clock
+Text GLabel 3850 6950 0    51   Input ~ 0
+clock
+Text GLabel 3850 7150 0    51   Input ~ 0
+clock
+$Comp
+L pi-adapter-rescue:CONN_01X04-RESCUE-pi-adapter P2
+U 1 1 56C16676
+P 5550 1000
+F 0 "P2" V 5515 756 50  0000 R CNN
+F 1 "CONN_01X04" V 5423 756 50  0000 R CNN
+F 2 "Pin_Headers:Pin_Header_Straight_1x04" V 5377 756 50  0001 R CNN
+F 3 "" H 5550 1000 50  0000 C CNN
+	1    5550 1000
+	0    -1   -1   0   
+$EndComp
+$Comp
+L pi-adapter-rescue:CONN_01X04-RESCUE-pi-adapter P1
+U 1 1 56C1694E
+P 5550 2300
+F 0 "P1" V 5422 2056 50  0000 R CNN
+F 1 "CONN_01X04" V 5514 2056 50  0000 R CNN
+F 2 "Pin_Headers:Pin_Header_Straight_1x04" V 5377 2056 50  0001 R CNN
+F 3 "" H 5550 2300 50  0000 C CNN
+	1    5550 2300
+	0    -1   1    0   
+$EndComp
+$Comp
+L pi-adapter-rescue:CONN_01X04-RESCUE-pi-adapter P10
+U 1 1 56C16C70
+P 6050 1150
+F 0 "P10" V 6015 906 50  0000 R CNN
+F 1 "CONN_01X04" V 5923 906 50  0000 R CNN
+F 2 "Pin_Headers:Pin_Header_Straight_1x04" H 6050 1150 50  0001 C CNN
+F 3 "" H 6050 1150 50  0000 C CNN
+	1    6050 1150
+	0    -1   -1   0   
+$EndComp
+Wire Wire Line
+	5250 1250 5500 1250
+Wire Wire Line
+	5500 1250 5500 1200
+Wire Wire Line
+	5250 1350 5600 1350
+Wire Wire Line
+	5600 1350 5600 1200
+Wire Wire Line
+	5250 1850 5600 1850
+$Comp
+L pi-adapter-rescue:CONN_01X04-RESCUE-pi-adapter P9
+U 1 1 56C17042
+P 6050 2050
+F 0 "P9" V 5922 1806 50  0000 R CNN
+F 1 "CONN_01X04" V 6014 1806 50  0000 R CNN
+F 2 "Pin_Headers:Pin_Header_Straight_1x04" V 5877 1806 50  0001 R CNN
+F 3 "" H 6050 2050 50  0000 C CNN
+	1    6050 2050
+	0    -1   1    0   
+$EndComp
+Wire Wire Line
+	5250 1550 6100 1550
+Wire Wire Line
+	6100 1550 6100 1350
+Wire Wire Line
+	5250 1450 6000 1450
+Wire Wire Line
+	6000 1450 6000 1350
+Wire Wire Line
+	6100 1650 6100 1850
+Wire Wire Line
+	5400 1200 5400 1700
+Wire Wire Line
+	5900 1350 5900 1700
+$Comp
+L pi-adapter-rescue:CONN_02X20-RESCUE-pi-adapter P20
+U 1 1 54ECB2B7
+P 2150 3650
+F 0 "P20" H 2150 4700 50  0000 C CNN
+F 1 "CONN_02X20" V 2150 3650 50  0000 C CNN
+F 2 "Pin_Headers:Pin_Header_Straight_2x20" H 2150 2700 60  0001 C CNN
+F 3 "" H 2150 2700 60  0000 C CNN
+	1    2150 3650
+	1    0    0    -1  
+$EndComp
+$Comp
+L pi-adapter-rescue:CONN_01X03-RESCUE-pi-adapter P23
+U 1 1 56C196A7
+P 3000 3100
+F 0 "P23" H 3077 3138 50  0000 L CNN
+F 1 "UART" H 3077 3046 50  0000 L CNN
+F 2 "Pin_Headers:Pin_Header_Straight_1x03" H 3000 3100 50  0001 C CNN
+F 3 "" H 3000 3100 50  0000 C CNN
+	1    3000 3100
+	1    0    0    1   
+$EndComp
+$Comp
+L power:GND #PWR020
+U 1 1 56C198BA
+P 2800 3300
+F 0 "#PWR020" H 2800 3300 30  0001 C CNN
+F 1 "GND" H 2800 3230 30  0001 C CNN
+F 2 "" H 2800 3300 60  0000 C CNN
+F 3 "" H 2800 3300 60  0000 C CNN
+	1    2800 3300
+	1    0    0    -1  
+$EndComp
+$Comp
+L pi-adapter-rescue:CONN_01X03-RESCUE-pi-adapter P21
+U 1 1 56C19AA9
+P 1200 2900
+F 0 "P21" H 1119 2568 50  0000 C CNN
+F 1 "I2C" H 1119 2660 50  0000 C CNN
+F 2 "Pin_Headers:Pin_Header_Straight_1x03" H 1200 2900 50  0001 C CNN
+F 3 "" H 1200 2900 50  0000 C CNN
+	1    1200 2900
+	-1   0    0    1   
+$EndComp
+Wire Wire Line
+	1400 2800 1900 2800
+Wire Wire Line
+	1400 2900 1900 2900
+Text GLabel 2400 3700 2    51   Output ~ 0
+D7
+Text GLabel 3850 1850 0    51   Input ~ 0
+D1
+Text GLabel 3850 1650 0    51   Input ~ 0
+D2
+Text GLabel 3850 1550 0    51   Input ~ 0
+D3
+Text GLabel 3850 1350 0    51   Input ~ 0
+D4
+Text GLabel 3850 3550 0    51   Input ~ 0
+D5
+Text GLabel 3850 3350 0    51   Input ~ 0
+D6
+Text GLabel 3850 3250 0    51   Input ~ 0
+D7
+Text GLabel 3850 3050 0    51   Input ~ 0
+D8
+Text GLabel 3850 5250 0    51   Input ~ 0
+D9
+Text GLabel 3850 5050 0    51   Input ~ 0
+D10
+Text GLabel 3850 4950 0    51   Input ~ 0
+D11
+Text GLabel 3850 4750 0    51   Input ~ 0
+D12
+Text GLabel 3850 7050 0    51   Input ~ 0
+D13
+Text GLabel 3850 6850 0    51   Input ~ 0
+D14
+Text GLabel 3850 6750 0    51   Input ~ 0
+D15
+Text GLabel 3850 6550 0    51   Input ~ 0
+D16
+Wire Wire Line
+	1300 1300 1400 1300
+Text GLabel 1400 1300 2    60   Input ~ 0
+LED-Power+
+Text GLabel 6250 1600 2    51   Input ~ 0
+LED-Power+
+Wire Wire Line
+	1300 5450 1300 5500
+Wire Wire Line
+	1300 5700 1300 5750
+Wire Wire Line
+	5250 1650 6100 1650
+Wire Wire Line
+	6000 1850 6000 1750
+Wire Wire Line
+	6000 1750 5250 1750
+Wire Wire Line
+	5250 1950 5500 1950
+Wire Wire Line
+	5500 1950 5500 2100
+Wire Wire Line
+	5600 1850 5600 2100
+Wire Wire Line
+	5700 1200 5700 1600
+Wire Wire Line
+	6200 1350 6200 1600
+Wire Wire Line
+	5700 1600 6200 1600
+Connection ~ 6200 1600
+Connection ~ 5700 1600
+Wire Wire Line
+	5400 1700 5900 1700
+Connection ~ 5900 1700
+Connection ~ 5400 1700
+Text Notes 5150 900  0    60   ~ 0
+LP- CLK DO LP+\n
+$Comp
+L pi-adapter-rescue:CONN_01X04-RESCUE-pi-adapter P4
+U 1 1 56C22C41
+P 5550 2700
+F 0 "P4" V 5515 2456 50  0000 R CNN
+F 1 "CONN_01X04" V 5423 2456 50  0000 R CNN
+F 2 "Pin_Headers:Pin_Header_Straight_1x04" V 5377 2456 50  0001 R CNN
+F 3 "" H 5550 2700 50  0000 C CNN
+	1    5550 2700
+	0    -1   -1   0   
+$EndComp
+$Comp
+L pi-adapter-rescue:CONN_01X04-RESCUE-pi-adapter P3
+U 1 1 56C22C47
+P 5550 4000
+F 0 "P3" V 5422 3756 50  0000 R CNN
+F 1 "CONN_01X04" V 5514 3756 50  0000 R CNN
+F 2 "Pin_Headers:Pin_Header_Straight_1x04" V 5377 3756 50  0001 R CNN
+F 3 "" H 5550 4000 50  0000 C CNN
+	1    5550 4000
+	0    -1   1    0   
+$EndComp
+$Comp
+L pi-adapter-rescue:CONN_01X04-RESCUE-pi-adapter P12
+U 1 1 56C22C4D
+P 6050 2850
+F 0 "P12" V 6015 2606 50  0000 R CNN
+F 1 "CONN_01X04" V 5923 2606 50  0000 R CNN
+F 2 "Pin_Headers:Pin_Header_Straight_1x04" H 6050 2850 50  0001 C CNN
+F 3 "" H 6050 2850 50  0000 C CNN
+	1    6050 2850
+	0    -1   -1   0   
+$EndComp
+Wire Wire Line
+	5250 2950 5500 2950
+Wire Wire Line
+	5500 2950 5500 2900
+Wire Wire Line
+	5250 3050 5600 3050
+Wire Wire Line
+	5600 3050 5600 2900
+Wire Wire Line
+	5250 3550 5600 3550
+$Comp
+L pi-adapter-rescue:CONN_01X04-RESCUE-pi-adapter P11
+U 1 1 56C22C58
+P 6050 3750
+F 0 "P11" V 5922 3506 50  0000 R CNN
+F 1 "CONN_01X04" V 6014 3506 50  0000 R CNN
+F 2 "Pin_Headers:Pin_Header_Straight_1x04" V 5877 3506 50  0001 R CNN
+F 3 "" H 6050 3750 50  0000 C CNN
+	1    6050 3750
+	0    -1   1    0   
+$EndComp
+Wire Wire Line
+	5250 3250 6100 3250
+Wire Wire Line
+	6100 3250 6100 3050
+Wire Wire Line
+	5250 3150 6000 3150
+Wire Wire Line
+	6000 3150 6000 3050
+Wire Wire Line
+	6100 3350 6100 3550
+Wire Wire Line
+	5400 2900 5400 3400
+Wire Wire Line
+	5900 3050 5900 3400
+Text GLabel 6250 3300 2    51   Input ~ 0
+LED-Power+
+Wire Wire Line
+	5250 3350 6100 3350
+Wire Wire Line
+	6000 3550 6000 3450
+Wire Wire Line
+	6000 3450 5250 3450
+Wire Wire Line
+	5250 3650 5500 3650
+Wire Wire Line
+	5500 3650 5500 3800
+Wire Wire Line
+	5600 3550 5600 3800
+Wire Wire Line
+	5700 2900 5700 3300
+Wire Wire Line
+	6200 3050 6200 3300
+Wire Wire Line
+	5700 3300 6200 3300
+Connection ~ 6200 3300
+Connection ~ 5700 3300
+Wire Wire Line
+	5400 3400 5900 3400
+Connection ~ 5900 3400
+Connection ~ 5400 3400
+Text Notes 5150 2600 0    60   ~ 0
+LP- CLK DO LP+\n
+$Comp
+L pi-adapter-rescue:CONN_01X04-RESCUE-pi-adapter P6
+U 1 1 56C22D24
+P 5550 4400
+F 0 "P6" V 5515 4156 50  0000 R CNN
+F 1 "CONN_01X04" V 5423 4156 50  0000 R CNN
+F 2 "Pin_Headers:Pin_Header_Straight_1x04" V 5377 4156 50  0001 R CNN
+F 3 "" H 5550 4400 50  0000 C CNN
+	1    5550 4400
+	0    -1   -1   0   
+$EndComp
+$Comp
+L pi-adapter-rescue:CONN_01X04-RESCUE-pi-adapter P5
+U 1 1 56C22D2A
+P 5550 5700
+F 0 "P5" V 5422 5456 50  0000 R CNN
+F 1 "CONN_01X04" V 5514 5456 50  0000 R CNN
+F 2 "Pin_Headers:Pin_Header_Straight_1x04" V 5377 5456 50  0001 R CNN
+F 3 "" H 5550 5700 50  0000 C CNN
+	1    5550 5700
+	0    -1   1    0   
+$EndComp
+$Comp
+L pi-adapter-rescue:CONN_01X04-RESCUE-pi-adapter P14
+U 1 1 56C22D30
+P 6050 4550
+F 0 "P14" V 6015 4306 50  0000 R CNN
+F 1 "CONN_01X04" V 5923 4306 50  0000 R CNN
+F 2 "Pin_Headers:Pin_Header_Straight_1x04" H 6050 4550 50  0001 C CNN
+F 3 "" H 6050 4550 50  0000 C CNN
+	1    6050 4550
+	0    -1   -1   0   
+$EndComp
+Wire Wire Line
+	5250 4650 5500 4650
+Wire Wire Line
+	5500 4650 5500 4600
+Wire Wire Line
+	5250 4750 5600 4750
+Wire Wire Line
+	5600 4750 5600 4600
+Wire Wire Line
+	5250 5250 5600 5250
+$Comp
+L pi-adapter-rescue:CONN_01X04-RESCUE-pi-adapter P13
+U 1 1 56C22D3B
+P 6050 5450
+F 0 "P13" V 5922 5206 50  0000 R CNN
+F 1 "CONN_01X04" V 6014 5206 50  0000 R CNN
+F 2 "Pin_Headers:Pin_Header_Straight_1x04" V 5877 5206 50  0001 R CNN
+F 3 "" H 6050 5450 50  0000 C CNN
+	1    6050 5450
+	0    -1   1    0   
+$EndComp
+Wire Wire Line
+	5250 4950 6100 4950
+Wire Wire Line
+	6100 4950 6100 4750
+Wire Wire Line
+	5250 4850 6000 4850
+Wire Wire Line
+	6000 4850 6000 4750
+Wire Wire Line
+	6100 5050 6100 5250
+Wire Wire Line
+	5400 4600 5400 5100
+Wire Wire Line
+	5900 4750 5900 5100
+Text GLabel 6250 5000 2    51   Input ~ 0
+LED-Power+
+Wire Wire Line
+	5250 5050 6100 5050
+Wire Wire Line
+	6000 5250 6000 5150
+Wire Wire Line
+	6000 5150 5250 5150
+Wire Wire Line
+	5250 5350 5500 5350
+Wire Wire Line
+	5500 5350 5500 5500
+Wire Wire Line
+	5600 5250 5600 5500
+Wire Wire Line
+	5700 4600 5700 5000
+Wire Wire Line
+	6200 4750 6200 5000
+Wire Wire Line
+	5700 5000 6200 5000
+Connection ~ 6200 5000
+Connection ~ 5700 5000
+Wire Wire Line
+	5400 5100 5900 5100
+Connection ~ 5900 5100
+Connection ~ 5400 5100
+Text Notes 5150 4300 0    60   ~ 0
+LP- CLK DO LP+\n
+$Comp
+L pi-adapter-rescue:CONN_01X04-RESCUE-pi-adapter P8
+U 1 1 56C22EEF
+P 5550 6200
+F 0 "P8" V 5515 5956 50  0000 R CNN
+F 1 "CONN_01X04" V 5423 5956 50  0000 R CNN
+F 2 "Pin_Headers:Pin_Header_Straight_1x04" V 5377 5956 50  0001 R CNN
+F 3 "" H 5550 6200 50  0000 C CNN
+	1    5550 6200
+	0    -1   -1   0   
+$EndComp
+$Comp
+L pi-adapter-rescue:CONN_01X04-RESCUE-pi-adapter P7
+U 1 1 56C22EF5
+P 5550 7500
+F 0 "P7" V 5422 7256 50  0000 R CNN
+F 1 "CONN_01X04" V 5514 7256 50  0000 R CNN
+F 2 "Pin_Headers:Pin_Header_Straight_1x04" V 5377 7256 50  0001 R CNN
+F 3 "" H 5550 7500 50  0000 C CNN
+	1    5550 7500
+	0    -1   1    0   
+$EndComp
+$Comp
+L pi-adapter-rescue:CONN_01X04-RESCUE-pi-adapter P16
+U 1 1 56C22EFB
+P 6050 6350
+F 0 "P16" V 6015 6106 50  0000 R CNN
+F 1 "CONN_01X04" V 5923 6106 50  0000 R CNN
+F 2 "Pin_Headers:Pin_Header_Straight_1x04" H 6050 6350 50  0001 C CNN
+F 3 "" H 6050 6350 50  0000 C CNN
+	1    6050 6350
+	0    -1   -1   0   
+$EndComp
+Wire Wire Line
+	5250 6450 5500 6450
+Wire Wire Line
+	5500 6450 5500 6400
+Wire Wire Line
+	5250 6550 5600 6550
+Wire Wire Line
+	5600 6550 5600 6400
+Wire Wire Line
+	5250 7050 5600 7050
+$Comp
+L pi-adapter-rescue:CONN_01X04-RESCUE-pi-adapter P15
+U 1 1 56C22F06
+P 6050 7250
+F 0 "P15" V 5922 7006 50  0000 R CNN
+F 1 "CONN_01X04" V 6014 7006 50  0000 R CNN
+F 2 "Pin_Headers:Pin_Header_Straight_1x04" V 5877 7006 50  0001 R CNN
+F 3 "" H 6050 7250 50  0000 C CNN
+	1    6050 7250
+	0    -1   1    0   
+$EndComp
+Wire Wire Line
+	5250 6750 6100 6750
+Wire Wire Line
+	6100 6750 6100 6550
+Wire Wire Line
+	5250 6650 6000 6650
+Wire Wire Line
+	6000 6650 6000 6550
+Wire Wire Line
+	6100 6850 6100 7050
+Wire Wire Line
+	5400 6400 5400 6900
+Wire Wire Line
+	5900 6550 5900 6900
+Text GLabel 6250 6800 2    51   Input ~ 0
+LED-Power+
+Wire Wire Line
+	5250 6850 6100 6850
+Wire Wire Line
+	6000 7050 6000 6950
+Wire Wire Line
+	6000 6950 5250 6950
+Wire Wire Line
+	5250 7150 5500 7150
+Wire Wire Line
+	5500 7150 5500 7300
+Wire Wire Line
+	5600 7050 5600 7300
+Wire Wire Line
+	5700 6400 5700 6800
+Wire Wire Line
+	6200 6550 6200 6800
+Wire Wire Line
+	5700 6800 6200 6800
+Connection ~ 6200 6800
+Connection ~ 5700 6800
+Connection ~ 5900 6900
+Connection ~ 5400 6900
+Text Notes 5150 6100 0    60   ~ 0
+LP- CLK DO LP+\n
+Wire Wire Line
+	1400 3600 1900 3600
+Wire Wire Line
+	1400 3700 1900 3700
+Wire Wire Line
+	1400 3800 1900 3800
+$Comp
+L pi-adapter-rescue:CONN_01X06-RESCUE-pi-adapter P22
+U 1 1 56C265D6
+P 1200 3850
+F 0 "P22" H 1119 3368 50  0000 C CNN
+F 1 "System SPI" H 1119 3460 50  0000 C CNN
+F 2 "Pin_Headers:Pin_Header_Straight_1x06" H 1119 3460 50  0001 C CNN
+F 3 "" H 1200 3850 50  0000 C CNN
+	1    1200 3850
+	-1   0    0    1   
+$EndComp
+Wire Wire Line
+	1400 4100 1400 4150
+Wire Wire Line
+	1400 4100 1650 4100
+Wire Wire Line
+	1650 4100 1650 3900
+Text GLabel 2400 3800 2    51   Output ~ 0
+CS0
+Text GLabel 2400 3900 2    51   Output ~ 0
+CS1
+Text GLabel 1400 3900 2    51   Input ~ 0
+CS0
+Text GLabel 1400 4000 2    51   Input ~ 0
+CS1
+Text Label 1500 3600 0    60   ~ 0
+MOSI
+Text Label 1500 3700 0    60   ~ 0
+MISO
+Text Label 1500 3800 0    60   ~ 0
+SCLK
+$Comp
+L power:PWR_FLAG #FLG027
+U 1 1 56CA8545
+P 1450 1850
+F 0 "#FLG027" H 1450 1945 50  0001 C CNN
+F 1 "PWR_FLAG" H 1600 2000 50  0000 C CNN
+F 2 "" H 1450 1850 60  0000 C CNN
+F 3 "" H 1450 1850 60  0000 C CNN
+	1    1450 1850
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	2400 2700 2450 2700
+$Comp
+L power:GND #PWR028
+U 1 1 56CF0349
+P 2500 4100
+F 0 "#PWR028" H 2500 4100 30  0001 C CNN
+F 1 "GND" H 2500 4030 30  0001 C CNN
+F 2 "" H 2500 4100 60  0000 C CNN
+F 3 "" H 2500 4100 60  0000 C CNN
+	1    2500 4100
+	0    -1   -1   0   
+$EndComp
+Wire Wire Line
+	2400 4100 2500 4100
+NoConn ~ 1900 2700
+Wire Wire Line
+	2800 3200 2800 3300
+Wire Wire Line
+	2800 3300 2400 3300
+Connection ~ 2800 3300
+Wire Wire Line
+	2400 3000 2800 3000
+Wire Wire Line
+	2400 3100 2800 3100
+NoConn ~ 1900 3100
+Text Label 1500 2800 0    60   ~ 0
+SDA
+Text Label 1500 2900 0    60   ~ 0
+SCL
+Text Label 2600 3000 0    60   ~ 0
+TxD
+Text Label 2600 3100 0    60   ~ 0
+RxD
+$Comp
+L power:GND #PWR016
+U 1 1 5934A175
+P 1400 3000
+F 0 "#PWR016" H 1400 3000 30  0001 C CNN
+F 1 "GND" H 1400 2930 30  0001 C CNN
+F 2 "" H 1400 3000 60  0000 C CNN
+F 3 "" H 1400 3000 60  0000 C CNN
+	1    1400 3000
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR019
+U 1 1 5A05CF1D
+P 1300 1750
+F 0 "#PWR019" H 1300 1750 30  0001 C CNN
+F 1 "GND" H 1300 1680 30  0001 C CNN
+F 2 "" H 1300 1750 60  0000 C CNN
+F 3 "" H 1300 1750 60  0000 C CNN
+	1    1300 1750
+	0    -1   -1   0   
+$EndComp
+Wire Wire Line
+	1300 1850 1450 1850
+Connection ~ 1450 1850
+Text GLabel 1400 1500 2    60   Input ~ 0
+LED-Power-
+Wire Wire Line
+	1300 1500 1400 1500
+Text GLabel 6250 6900 2    51   Input ~ 0
+LED-Power-
+Wire Wire Line
+	5400 6900 5900 6900
+Text GLabel 6250 5100 2    51   Input ~ 0
+LED-Power-
+Text GLabel 6250 3400 2    51   Input ~ 0
+LED-Power-
+Text GLabel 6250 1700 2    51   Input ~ 0
+LED-Power-
+$Comp
+L Connector:Conn_01x02 P17
+U 1 1 5A073702
+P 1100 1750
+F 0 "P17" H 1180 1742 50  0000 L CNN
+F 1 "5V" H 1180 1651 50  0000 L CNN
+F 2 "" H 1100 1750 50  0001 C CNN
+F 3 "~" H 1100 1750 50  0001 C CNN
+	1    1100 1750
+	-1   0    0    -1  
+$EndComp
+$Comp
+L Connector:Conn_02x02_Odd_Even J1
+U 1 1 5A07465F
+P 1450 2300
+F 0 "J1" H 1500 1975 50  0000 C CNN
+F 1 "Conn_02x02_Odd_Even" H 1500 2066 50  0000 C CNN
+F 2 "Pin_Headers:Pin_Header_Straight_2x02_Pitch2.54mm" H 1450 2300 50  0001 C CNN
+F 3 "~" H 1450 2300 50  0001 C CNN
+	1    1450 2300
+	1    0    0    1   
+$EndComp
+$Comp
+L power:GND #PWR017
+U 1 1 5A0746F3
+P 1250 2200
+F 0 "#PWR017" H 1250 2200 30  0001 C CNN
+F 1 "GND" H 1250 2130 30  0001 C CNN
+F 2 "" H 1250 2200 60  0000 C CNN
+F 3 "" H 1250 2200 60  0000 C CNN
+	1    1250 2200
+	0    1    1    0   
+$EndComp
+$Comp
+L power:VCC #PWR021
+U 1 1 5A074782
+P 850 2300
+F 0 "#PWR021" H 850 2400 30  0001 C CNN
+F 1 "VCC" H 850 2400 30  0000 C CNN
+F 2 "" H 850 2300 60  0000 C CNN
+F 3 "" H 850 2300 60  0000 C CNN
+	1    850  2300
+	0    -1   -1   0   
+$EndComp
+Text GLabel 1750 2200 2    51   Input ~ 0
+LED-Power-
+Text GLabel 1750 2300 2    51   Input ~ 0
+LED-Power+
+Wire Wire Line
+	850  2300 950  2300
+$Comp
+L power:PWR_FLAG #FLG01
+U 1 1 5A074EE6
+P 950 2300
+F 0 "#FLG01" H 950 2395 50  0001 C CNN
+F 1 "PWR_FLAG" H 1100 2450 50  0000 C CNN
+F 2 "" H 950 2300 60  0000 C CNN
+F 3 "" H 950 2300 60  0000 C CNN
+	1    950  2300
+	1    0    0    -1  
+$EndComp
+Connection ~ 950  2300
+$Comp
+L power:VCC #PWR022
+U 1 1 5A075B41
+P 2450 2650
+F 0 "#PWR022" H 2450 2750 30  0001 C CNN
+F 1 "VCC" H 2450 2750 30  0000 C CNN
+F 2 "" H 2450 2650 60  0000 C CNN
+F 3 "" H 2450 2650 60  0000 C CNN
+	1    2450 2650
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	2450 2700 2450 2800
+Wire Wire Line
+	1850 4600 1900 4600
+Wire Wire Line
+	6200 1600 6200 1850
+Wire Wire Line
+	6200 1600 6250 1600
+Wire Wire Line
+	5700 1600 5700 2100
+Wire Wire Line
+	5900 1700 5900 1850
+Wire Wire Line
+	5900 1700 6250 1700
+Wire Wire Line
+	5400 1700 5400 2100
+Wire Wire Line
+	6200 3300 6200 3550
+Wire Wire Line
+	6200 3300 6250 3300
+Wire Wire Line
+	5700 3300 5700 3800
+Wire Wire Line
+	5900 3400 5900 3550
+Wire Wire Line
+	5900 3400 6250 3400
+Wire Wire Line
+	5400 3400 5400 3800
+Wire Wire Line
+	6200 5000 6200 5250
+Wire Wire Line
+	6200 5000 6250 5000
+Wire Wire Line
+	5700 5000 5700 5500
+Wire Wire Line
+	5900 5100 5900 5250
+Wire Wire Line
+	5900 5100 6250 5100
+Wire Wire Line
+	5400 5100 5400 5500
+Wire Wire Line
+	6200 6800 6200 7050
+Wire Wire Line
+	6200 6800 6250 6800
+Wire Wire Line
+	5700 6800 5700 7300
+Wire Wire Line
+	5900 6900 5900 7050
+Wire Wire Line
+	5900 6900 6250 6900
+Wire Wire Line
+	5400 6900 5400 7300
+Wire Wire Line
+	1450 1850 1600 1850
+Wire Wire Line
+	950  2300 1250 2300
+Wire Wire Line
+	1300 5450 1600 5450
+Wire Wire Line
+	1300 5750 1600 5750
+Wire Wire Line
+	1900 5450 2200 5450
+Wire Wire Line
+	1900 5750 2200 5750
+Connection ~ 1600 5450
+Wire Wire Line
+	1600 5450 1900 5450
+Connection ~ 1600 5750
+Wire Wire Line
+	1600 5750 1900 5750
+Connection ~ 2200 5750
+Wire Wire Line
+	2200 5750 2450 5750
+Connection ~ 2200 5450
+Wire Wire Line
+	2200 5450 2450 5450
+$EndSCHEMATC
