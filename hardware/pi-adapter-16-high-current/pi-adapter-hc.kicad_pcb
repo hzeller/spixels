@@ -163,7 +163,7 @@
     (property "Sheet name" "")
     (path "/42648883-fc4b-4188-92dd-8594c954c16f")
     (attr through_hole)
-    (fp_text reference "P20" (at 1.27 -2.33 90) (layer "F.SilkS")
+    (fp_text reference "P20" (at 6.58 -1.95 180) (layer "F.SilkS")
       (effects (font (size 1 1) (thickness 0.15)))
       (tstamp 4e852894-0596-4f9a-a95e-2bbbc3e013fc)
     )
