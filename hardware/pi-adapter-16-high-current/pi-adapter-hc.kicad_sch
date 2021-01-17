@@ -969,8 +969,8 @@
   (junction (at 147.32 119.38) (diameter 1.016) (color 0 0 0 0))
   (junction (at 147.32 165.1) (diameter 1.016) (color 0 0 0 0))
 
-  (no_connect (at 48.26 78.74))
   (no_connect (at 48.26 68.58))
+  (no_connect (at 48.26 78.74))
   (no_connect (at 48.26 88.9))
   (no_connect (at 48.26 101.6))
   (no_connect (at 60.96 101.6))
@@ -2453,7 +2453,7 @@
   )
 
   (symbol (lib_id "pi-adapter-rescue:CONN_01X01-RESCUE-pi-adapter") (at 26.67 17.78 180) (unit 1)
-    (in_bom yes) (on_board yes)
+    (in_bom no) (on_board yes)
     (uuid "00000000-0000-0000-0000-0000562b3873")
     (property "Reference" "P30" (id 0) (at 24.13 17.78 0))
     (property "Value" "+5V" (id 1) (at 24.13 17.78 90)
@@ -2468,7 +2468,7 @@
   )
 
   (symbol (lib_id "pi-adapter-rescue:CONN_01X01-RESCUE-pi-adapter") (at 26.67 22.86 180) (unit 1)
-    (in_bom yes) (on_board yes)
+    (in_bom no) (on_board yes)
     (uuid "00000000-0000-0000-0000-0000562b38c3")
     (property "Reference" "P31" (id 0) (at 24.13 22.86 0))
     (property "Value" "GND" (id 1) (at 24.13 22.86 90)
@@ -2483,7 +2483,7 @@
   )
 
   (symbol (lib_id "pi-adapter-rescue:CONN_01X01-RESCUE-pi-adapter") (at 26.67 27.94 180) (unit 1)
-    (in_bom yes) (on_board yes)
+    (in_bom no) (on_board yes)
     (uuid "64d65675-544d-44cd-af4a-9d1f345b04f5")
     (property "Reference" "P32" (id 0) (at 24.13 27.94 0))
     (property "Value" "+5V" (id 1) (at 24.13 27.94 90)
@@ -2498,7 +2498,7 @@
   )
 
   (symbol (lib_id "pi-adapter-rescue:CONN_01X01-RESCUE-pi-adapter") (at 26.67 33.02 180) (unit 1)
-    (in_bom yes) (on_board yes)
+    (in_bom no) (on_board yes)
     (uuid "f640fe79-9dcd-403a-8967-773ea4ffeb8e")
     (property "Reference" "P33" (id 0) (at 24.13 33.02 0))
     (property "Value" "GND" (id 1) (at 24.13 33.02 90)
@@ -2533,7 +2533,7 @@
   )
 
   (symbol (lib_id "pi-adapter-hc-rescue:Conn_01x02-Connector") (at 27.94 44.45 0) (mirror y) (unit 1)
-    (in_bom yes) (on_board yes)
+    (in_bom no) (on_board yes)
     (uuid "00000000-0000-0000-0000-00005a073702")
     (property "Reference" "P17" (id 0) (at 25.908 44.6532 0)
       (effects (font (size 1.27 1.27)) (justify left))
@@ -2642,7 +2642,7 @@
   )
 
   (symbol (lib_id "pi-adapter-rescue:CONN_01X03-RESCUE-pi-adapter") (at 30.48 73.66 180) (unit 1)
-    (in_bom yes) (on_board yes)
+    (in_bom no) (on_board yes)
     (uuid "00000000-0000-0000-0000-000056c19aa9")
     (property "Reference" "P21" (id 0) (at 32.5374 65.2272 0))
     (property "Value" "I2C" (id 1) (at 32.5374 67.564 0))
@@ -2653,7 +2653,7 @@
   )
 
   (symbol (lib_id "pi-adapter-rescue:CONN_01X03-RESCUE-pi-adapter") (at 76.2 78.74 0) (mirror x) (unit 1)
-    (in_bom yes) (on_board yes)
+    (in_bom no) (on_board yes)
     (uuid "00000000-0000-0000-0000-000056c196a7")
     (property "Reference" "P23" (id 0) (at 78.1558 79.7052 0)
       (effects (font (size 1.27 1.27)) (justify left))
@@ -2668,7 +2668,7 @@
   )
 
   (symbol (lib_id "pi-adapter-rescue:CONN_01X04-RESCUE-pi-adapter") (at 130.81 20.32 90) (unit 1)
-    (in_bom yes) (on_board yes)
+    (in_bom no) (on_board yes)
     (uuid "00000000-0000-0000-0000-000056c16676")
     (property "Reference" "P2" (id 0) (at 137.0076 21.209 90)
       (effects (font (size 1.27 1.27)) (justify right))
@@ -2683,7 +2683,7 @@
   )
 
   (symbol (lib_id "pi-adapter-rescue:CONN_01X04-RESCUE-pi-adapter") (at 130.81 53.34 90) (mirror x) (unit 1)
-    (in_bom yes) (on_board yes)
+    (in_bom no) (on_board yes)
     (uuid "00000000-0000-0000-0000-000056c1694e")
     (property "Reference" "P1" (id 0) (at 137.0076 50.0888 90)
       (effects (font (size 1.27 1.27)) (justify right))
@@ -2698,7 +2698,7 @@
   )
 
   (symbol (lib_id "pi-adapter-rescue:CONN_01X04-RESCUE-pi-adapter") (at 130.81 63.5 90) (unit 1)
-    (in_bom yes) (on_board yes)
+    (in_bom no) (on_board yes)
     (uuid "00000000-0000-0000-0000-000056c22c41")
     (property "Reference" "P4" (id 0) (at 137.0076 64.389 90)
       (effects (font (size 1.27 1.27)) (justify right))
@@ -2713,7 +2713,7 @@
   )
 
   (symbol (lib_id "pi-adapter-rescue:CONN_01X04-RESCUE-pi-adapter") (at 130.81 96.52 90) (mirror x) (unit 1)
-    (in_bom yes) (on_board yes)
+    (in_bom no) (on_board yes)
     (uuid "00000000-0000-0000-0000-000056c22c47")
     (property "Reference" "P3" (id 0) (at 137.0076 93.2688 90)
       (effects (font (size 1.27 1.27)) (justify right))
@@ -2728,7 +2728,7 @@
   )
 
   (symbol (lib_id "pi-adapter-rescue:CONN_01X04-RESCUE-pi-adapter") (at 130.81 106.68 90) (unit 1)
-    (in_bom yes) (on_board yes)
+    (in_bom no) (on_board yes)
     (uuid "00000000-0000-0000-0000-000056c22d24")
     (property "Reference" "P6" (id 0) (at 137.0076 107.569 90)
       (effects (font (size 1.27 1.27)) (justify right))
@@ -2743,7 +2743,7 @@
   )
 
   (symbol (lib_id "pi-adapter-rescue:CONN_01X04-RESCUE-pi-adapter") (at 130.81 139.7 90) (mirror x) (unit 1)
-    (in_bom yes) (on_board yes)
+    (in_bom no) (on_board yes)
     (uuid "00000000-0000-0000-0000-000056c22d2a")
     (property "Reference" "P5" (id 0) (at 137.0076 136.4488 90)
       (effects (font (size 1.27 1.27)) (justify right))
@@ -2758,7 +2758,7 @@
   )
 
   (symbol (lib_id "pi-adapter-rescue:CONN_01X04-RESCUE-pi-adapter") (at 130.81 152.4 90) (unit 1)
-    (in_bom yes) (on_board yes)
+    (in_bom no) (on_board yes)
     (uuid "00000000-0000-0000-0000-000056c22eef")
     (property "Reference" "P8" (id 0) (at 137.0076 153.289 90)
       (effects (font (size 1.27 1.27)) (justify right))
@@ -2773,7 +2773,7 @@
   )
 
   (symbol (lib_id "pi-adapter-rescue:CONN_01X04-RESCUE-pi-adapter") (at 130.81 185.42 90) (mirror x) (unit 1)
-    (in_bom yes) (on_board yes)
+    (in_bom no) (on_board yes)
     (uuid "00000000-0000-0000-0000-000056c22ef5")
     (property "Reference" "P7" (id 0) (at 137.0076 182.1688 90)
       (effects (font (size 1.27 1.27)) (justify right))
@@ -2788,7 +2788,7 @@
   )
 
   (symbol (lib_id "pi-adapter-rescue:CONN_01X04-RESCUE-pi-adapter") (at 143.51 24.13 90) (unit 1)
-    (in_bom yes) (on_board yes)
+    (in_bom no) (on_board yes)
     (uuid "00000000-0000-0000-0000-000056c16c70")
     (property "Reference" "P10" (id 0) (at 149.7076 25.019 90)
       (effects (font (size 1.27 1.27)) (justify right))
@@ -2803,7 +2803,7 @@
   )
 
   (symbol (lib_id "pi-adapter-rescue:CONN_01X04-RESCUE-pi-adapter") (at 143.51 46.99 90) (mirror x) (unit 1)
-    (in_bom yes) (on_board yes)
+    (in_bom no) (on_board yes)
     (uuid "00000000-0000-0000-0000-000056c17042")
     (property "Reference" "P9" (id 0) (at 149.7076 43.7388 90)
       (effects (font (size 1.27 1.27)) (justify right))
@@ -2818,7 +2818,7 @@
   )
 
   (symbol (lib_id "pi-adapter-rescue:CONN_01X04-RESCUE-pi-adapter") (at 143.51 67.31 90) (unit 1)
-    (in_bom yes) (on_board yes)
+    (in_bom no) (on_board yes)
     (uuid "00000000-0000-0000-0000-000056c22c4d")
     (property "Reference" "P12" (id 0) (at 149.7076 68.199 90)
       (effects (font (size 1.27 1.27)) (justify right))
@@ -2833,7 +2833,7 @@
   )
 
   (symbol (lib_id "pi-adapter-rescue:CONN_01X04-RESCUE-pi-adapter") (at 143.51 90.17 90) (mirror x) (unit 1)
-    (in_bom yes) (on_board yes)
+    (in_bom no) (on_board yes)
     (uuid "00000000-0000-0000-0000-000056c22c58")
     (property "Reference" "P11" (id 0) (at 149.7076 86.9188 90)
       (effects (font (size 1.27 1.27)) (justify right))
@@ -2848,7 +2848,7 @@
   )
 
   (symbol (lib_id "pi-adapter-rescue:CONN_01X04-RESCUE-pi-adapter") (at 143.51 110.49 90) (unit 1)
-    (in_bom yes) (on_board yes)
+    (in_bom no) (on_board yes)
     (uuid "00000000-0000-0000-0000-000056c22d30")
     (property "Reference" "P14" (id 0) (at 149.7076 111.379 90)
       (effects (font (size 1.27 1.27)) (justify right))
@@ -2863,7 +2863,7 @@
   )
 
   (symbol (lib_id "pi-adapter-rescue:CONN_01X04-RESCUE-pi-adapter") (at 143.51 133.35 90) (mirror x) (unit 1)
-    (in_bom yes) (on_board yes)
+    (in_bom no) (on_board yes)
     (uuid "00000000-0000-0000-0000-000056c22d3b")
     (property "Reference" "P13" (id 0) (at 149.7076 130.0988 90)
       (effects (font (size 1.27 1.27)) (justify right))
@@ -2878,7 +2878,7 @@
   )
 
   (symbol (lib_id "pi-adapter-rescue:CONN_01X04-RESCUE-pi-adapter") (at 143.51 156.21 90) (unit 1)
-    (in_bom yes) (on_board yes)
+    (in_bom no) (on_board yes)
     (uuid "00000000-0000-0000-0000-000056c22efb")
     (property "Reference" "P16" (id 0) (at 149.7076 157.099 90)
       (effects (font (size 1.27 1.27)) (justify right))
@@ -2893,7 +2893,7 @@
   )
 
   (symbol (lib_id "pi-adapter-rescue:CONN_01X04-RESCUE-pi-adapter") (at 143.51 179.07 90) (mirror x) (unit 1)
-    (in_bom yes) (on_board yes)
+    (in_bom no) (on_board yes)
     (uuid "00000000-0000-0000-0000-000056c22f06")
     (property "Reference" "P15" (id 0) (at 149.7076 175.8188 90)
       (effects (font (size 1.27 1.27)) (justify right))
@@ -2908,7 +2908,7 @@
   )
 
   (symbol (lib_id "pi-adapter-hc-rescue:Conn_02x02_Odd_Even-Connector") (at 36.83 58.42 0) (mirror x) (unit 1)
-    (in_bom yes) (on_board yes)
+    (in_bom no) (on_board yes)
     (uuid "00000000-0000-0000-0000-00005a07465f")
     (property "Reference" "J1" (id 0) (at 38.1 50.165 0))
     (property "Value" "Conn_02x02_Odd_Even" (id 1) (at 38.1 52.4764 0))
@@ -2921,7 +2921,7 @@
   )
 
   (symbol (lib_id "pi-adapter-rescue:CONN_01X06-RESCUE-pi-adapter") (at 30.48 97.79 180) (unit 1)
-    (in_bom yes) (on_board yes)
+    (in_bom no) (on_board yes)
     (uuid "00000000-0000-0000-0000-000056c265d6")
     (property "Reference" "P22" (id 0) (at 32.5374 85.5472 0))
     (property "Value" "System SPI" (id 1) (at 32.5374 87.884 0))
@@ -2932,7 +2932,7 @@
   )
 
   (symbol (lib_id "Connector_Generic:Conn_02x20_Odd_Even") (at 53.34 91.44 0) (unit 1)
-    (in_bom yes) (on_board yes)
+    (in_bom no) (on_board yes)
     (uuid "42648883-fc4b-4188-92dd-8594c954c16f")
     (property "Reference" "P20" (id 0) (at 54.61 63.0998 0))
     (property "Value" "Pi-GPIO" (id 1) (at 54.61 65.398 0))
@@ -2948,7 +2948,7 @@
     (in_bom yes) (on_board yes)
     (uuid "112d91ea-543c-4be0-ba81-277d67a718a8")
     (property "Reference" "U1" (id 0) (at 101.6 19.666 0))
-    (property "Value" "74HC245" (id 1) (at 102.87 21.9645 0))
+    (property "Value" "74AHCT245" (id 1) (at 102.87 21.964 0))
     (property "Footprint" "Package_SO:TSSOP-20_4.4x6.5mm_P0.65mm" (id 2) (at 110.49 39.37 0)
       (effects (font (size 1.27 1.27)) hide)
     )
@@ -2961,7 +2961,7 @@
     (in_bom yes) (on_board yes)
     (uuid "e5ca536e-7088-4780-96e2-b54b13c07e93")
     (property "Reference" "U2" (id 0) (at 101.6 62.846 0))
-    (property "Value" "74HC245" (id 1) (at 102.87 65.1445 0))
+    (property "Value" "74AHCT245" (id 1) (at 102.87 65.144 0))
     (property "Footprint" "Package_SO:TSSOP-20_4.4x6.5mm_P0.65mm" (id 2) (at 110.49 82.55 0)
       (effects (font (size 1.27 1.27)) hide)
     )
@@ -2974,7 +2974,7 @@
     (in_bom yes) (on_board yes)
     (uuid "d0f488f5-d147-4508-9fb1-28f9a868cd2f")
     (property "Reference" "U3" (id 0) (at 101.6 106.026 0))
-    (property "Value" "74HC245" (id 1) (at 102.87 108.3245 0))
+    (property "Value" "74AHCT245" (id 1) (at 102.87 108.324 0))
     (property "Footprint" "Package_SO:TSSOP-20_4.4x6.5mm_P0.65mm" (id 2) (at 110.49 125.73 0)
       (effects (font (size 1.27 1.27)) hide)
     )
@@ -2987,7 +2987,7 @@
     (in_bom yes) (on_board yes)
     (uuid "5fb69334-a061-4a05-b220-62d5896a8c62")
     (property "Reference" "U4" (id 0) (at 101.6 151.746 0))
-    (property "Value" "74HC245" (id 1) (at 102.87 154.0445 0))
+    (property "Value" "74AHCT245" (id 1) (at 102.87 154.044 0))
     (property "Footprint" "Package_SO:TSSOP-20_4.4x6.5mm_P0.65mm" (id 2) (at 110.49 171.45 0)
       (effects (font (size 1.27 1.27)) hide)
     )
@@ -3185,16 +3185,16 @@
       (reference "P33") (unit 1) (value "GND") (footprint "Connector_PinHeader_1.00mm:PinHeader_1x01_P1.00mm_Vertical")
     )
     (path "/112d91ea-543c-4be0-ba81-277d67a718a8"
-      (reference "U1") (unit 1) (value "74HC245") (footprint "Package_SO:TSSOP-20_4.4x6.5mm_P0.65mm")
+      (reference "U1") (unit 1) (value "74AHCT245") (footprint "Package_SO:TSSOP-20_4.4x6.5mm_P0.65mm")
     )
     (path "/e5ca536e-7088-4780-96e2-b54b13c07e93"
-      (reference "U2") (unit 1) (value "74HC245") (footprint "Package_SO:TSSOP-20_4.4x6.5mm_P0.65mm")
+      (reference "U2") (unit 1) (value "74AHCT245") (footprint "Package_SO:TSSOP-20_4.4x6.5mm_P0.65mm")
     )
     (path "/d0f488f5-d147-4508-9fb1-28f9a868cd2f"
-      (reference "U3") (unit 1) (value "74HC245") (footprint "Package_SO:TSSOP-20_4.4x6.5mm_P0.65mm")
+      (reference "U3") (unit 1) (value "74AHCT245") (footprint "Package_SO:TSSOP-20_4.4x6.5mm_P0.65mm")
     )
     (path "/5fb69334-a061-4a05-b220-62d5896a8c62"
-      (reference "U4") (unit 1) (value "74HC245") (footprint "Package_SO:TSSOP-20_4.4x6.5mm_P0.65mm")
+      (reference "U4") (unit 1) (value "74AHCT245") (footprint "Package_SO:TSSOP-20_4.4x6.5mm_P0.65mm")
     )
   )
 )
