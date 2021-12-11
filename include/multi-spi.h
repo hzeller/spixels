@@ -95,7 +95,7 @@ public:
 //   "speed_mhz" rough speed in Mhz of the SPI clock. Useful values 1..15
 //   Default is 4. Increase if your set-up can do more and you need the
 //   speed. Decrease if you see erratic behavior.
-MultiSPI *CreateDirectMultiSPI(int speed_mhz = 4,
+MultiSPI *CreateDirectMultiSPI(float speed_mhz = 4,
                                int clock_gpio = MultiSPI::SPI_CLOCK);
 
 // Factory to create a MultiSPI implementation that uses DMA to output.

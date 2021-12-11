@@ -56,7 +56,7 @@ int MultiSPI::SPIPinForConnector(int connector) {
 namespace {
 class DirectMultiSPI : public MultiSPI {
 public:
-    explicit DirectMultiSPI(int speed_mhz, int clock_gpio);
+    explicit DirectMultiSPI(float speed_mhz, int clock_gpio);
     virtual ~DirectMultiSPI();
 
     virtual bool RegisterDataGPIO(int gpio, size_t serial_byte_size);
@@ -72,7 +72,7 @@ private:
 };
 }  // end anonymous namespace
 
-DirectMultiSPI::DirectMultiSPI(int speed_mhz, int clock_gpio)
+DirectMultiSPI::DirectMultiSPI(float speed_mhz, int clock_gpio)
     : clock_gpio_(clock_gpio),
       write_repeat_(std::max(2, (int)roundf(30.0 / speed_mhz))),
       size_(0), gpio_data_(NULL) {
@@ -126,7 +126,7 @@ void DirectMultiSPI::SendBuffers() {
 }
 
 // Public interface
-MultiSPI *CreateDirectMultiSPI(int speed_mhz, int clock_gpio) {
+MultiSPI *CreateDirectMultiSPI(float speed_mhz, int clock_gpio) {
     return new DirectMultiSPI(speed_mhz, clock_gpio);
 }
 }  // namespace spixels
