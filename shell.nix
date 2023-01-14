@@ -11,5 +11,6 @@ pkgs.mkShell {
       kicad
       python310Packages.kicad
       zip
+      gerbv
     ];
 }
