@@ -19,7 +19,7 @@ popt.SetOutputDirectory(plotDir)
 
 # Set some important plot options:
 popt.SetPlotFrameRef(False)
-popt.SetLineWidth(FromMM(0.35))
+popt.SetSketchPadLineWidth(FromMM(0.1))
 
 popt.SetAutoScale(False)
 popt.SetScale(1)
