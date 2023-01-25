@@ -28,11 +28,7 @@
 #include <sys/mman.h>
 #include <time.h>
 #include <unistd.h>
-
-// Raspberry 1 and 2 have different base addresses for the periphery
-#define BCM2708_PERI_BASE        0x20000000
-#define BCM2709_PERI_BASE        0x3F000000
-#define BCM2711_PERI_BASE        0xFE000000
+#include <bcm_host.h>
 
 #define GPIO_REGISTER_OFFSET         0x200000
 
@@ -76,80 +72,9 @@ bool GPIO::AddOutput(int bit) {
     return true;
 }
 
-// We are not interested in the _exact_ model, just good enough to determine
-// What to do.
-enum RaspberryPiModel {
-  PI_MODEL_1,
-  PI_MODEL_2,
-  PI_MODEL_3,
-  PI_MODEL_4
-};
-
-static int ReadFileToBuffer(char *buffer, size_t size, const char *filename) {
-  const int fd = open(filename, O_RDONLY);
-  if (fd < 0) return -1;
-  ssize_t r = read(fd, buffer, size - 1); // assume one read enough
-  buffer[r >= 0 ? r : 0] = '\0';
-  close(fd);
-  return r;
-}
-
-static RaspberryPiModel DetermineRaspberryModel() {
-  char buffer[4096];
-  if (ReadFileToBuffer(buffer, sizeof(buffer), "/proc/cpuinfo") < 0) {
-    fprintf(stderr, "Reading cpuinfo: Could not determine Pi model\n");
-    return PI_MODEL_3;  // safe guess fallback.
-  }
-  static const char RevisionTag[] = "Revision";
-  const char *revision_key;
-  if ((revision_key = strstr(buffer, RevisionTag)) == NULL) {
-    fprintf(stderr, "non-existent Revision: Could not determine Pi model\n");
-    return PI_MODEL_3;
-  }
-  unsigned int pi_revision;
-  if (sscanf(index(revision_key, ':') + 1, "%x", &pi_revision) != 1) {
-    fprintf(stderr, "Unknown Revision: Could not determine Pi model\n");
-    return PI_MODEL_3;
-  }
-
-  // https://www.raspberrypi.org/documentation/hardware/raspberrypi/revision-codes/README.md
-  const unsigned pi_type = (pi_revision >> 4) & 0xff;
-  switch (pi_type) {
-  case 0x00: /* A */
-  case 0x01: /* B, Compute Module 1 */
-  case 0x02: /* A+ */
-  case 0x03: /* B+ */
-  case 0x05: /* Alpha ?*/
-  case 0x06: /* Compute Module1 */
-  case 0x09: /* Zero */
-  case 0x0c: /* Zero W */
-    return PI_MODEL_1;
-
-  case 0x04:  /* Pi 2 */
-    return PI_MODEL_2;
-
-  case 0x11: /* Pi 4 */
-    return PI_MODEL_4;
-
-  default:  /* a bunch of versions represneting Pi 3 */
-    return PI_MODEL_3;
-  }
-}
-
-static RaspberryPiModel GetPiModel() {
-  static RaspberryPiModel pi_model = DetermineRaspberryModel();
-  return pi_model;
-}
-
 // Public interface
 uint32_t *mmap_bcm_register(off_t register_offset) {
-    off_t base = BCM2709_PERI_BASE;  // safe fallback guess.
-    switch (GetPiModel()) {
-    case PI_MODEL_1: base = BCM2708_PERI_BASE; break;
-    case PI_MODEL_2: base = BCM2709_PERI_BASE; break;
-    case PI_MODEL_3: base = BCM2709_PERI_BASE; break;
-    case PI_MODEL_4: base = BCM2711_PERI_BASE; break;
-    }
+    off_t base = bcm_host_get_peripheral_address();  // safe fallback guess.
 
     int mem_fd;
     if ((mem_fd = open("/dev/mem", O_RDWR|O_SYNC) ) < 0) {

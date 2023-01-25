@@ -1,7 +1,7 @@
 LIB_OBJECTS=ft-gpio.o dma-multi-spi.o rpi-dma.o mailbox.o direct-multi-spi.o led-strip.o
 CFLAGS=-Wall -O3 $(INCLUDES) $(DEFINES)
 CXXFLAGS=$(CFLAGS)
-INCLUDES=-I../include -I.
+INCLUDES=-I../include -I. -I/opt/vc/include
 
 libspixels.a: $(LIB_OBJECTS)
 	ar rcs $@ $^
