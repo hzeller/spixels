@@ -2,3 +2,8 @@
 *.o
 *.a
 simple
+.direnv/
+.envrc
+*-backups
+*-fab
+fp-info-cache
