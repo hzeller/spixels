@@ -9,6 +9,9 @@ pkgs.mkShell {
       git
       python3
       python3Packages.kicad
+      # Kicad packages refer to this, but don't
+      # bring into dependencies in 25.11
+      python3Packages.wxpython
       kicad
       zip
       gerbv
