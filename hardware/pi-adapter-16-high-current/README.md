@@ -5,6 +5,11 @@ Spixel board that allows two separate power supply inputs for 8 strands,
 and heavy copper pour to drive current to these. The backside allows to
 add additional power-carrying bars.
 
+**NOTE** while wiring up the LED strips: the connections are inside out with
+the negative power connection at the center of the board, followed by
+clock, data, and positive connection towards the long edges of the board (this
+is different from the wiring in the [low current board](../pi-adapter-16)).
+
 The power rails are named `LED-` and `LED+` as this would be the typical
 polarity configuration, but it also allows to wire them up with inverted
 polarity if the LED strips need `[-,data,clock,+]`,
