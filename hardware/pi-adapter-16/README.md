@@ -53,8 +53,18 @@ external power supplies, only connect GND, not 5V to prevent balancing currents.
 |   16 | 4x1 pin header              | 0.1" raster  | to connect to LED strips
 |    1 | Fuse holder                 | for 20mm fuse| Optional (see text)
 
-If you want to make the board, you can use KiCAD or directly the
-[Gerber files](./pi-adapter-fab.zip).
+### Making board
+
+Get a reasonable current version of kicad (or use the shell.nix) and call
+
+
+```
+make
+```
+
+This will create the gerbers in `pi-adapter-fab/` and also produces
+a `pi-adapter-fab.zip`, ready to be sent to a fab.
+
 It is also [shared on OSH Park][oshpark-pcb] (not affiliated).
 
 ![](../../img/pi-adapter-schematic.png)
