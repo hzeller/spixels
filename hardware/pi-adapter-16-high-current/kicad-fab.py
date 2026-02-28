@@ -28,7 +28,6 @@ popt.SetScale(1)
 popt.SetMirror(False)
 popt.SetUseGerberAttributes(False)
 popt.SetUseGerberProtelExtensions(True)
-popt.SetExcludeEdgeLayer(True);
 popt.SetScale(1)
 popt.SetUseAuxOrigin(True)
 
@@ -79,7 +78,7 @@ drlwriter.SetMapFileFormat( PLOT_FORMAT_PDF )
 
 mirror = False
 minimalHeader = False
-offset = wxPoint(0,0)
+offset = VECTOR2I(0, 0)
 mergeNPTH = True   # non-plated through-hole
 drlwriter.SetOptions( mirror, minimalHeader, offset, mergeNPTH )
 
