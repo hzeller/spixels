@@ -7,3 +7,5 @@ simple
 *-backups
 *-fab
 fp-info-cache
+*-fab.kicad_pcb
+*-fab.zip
